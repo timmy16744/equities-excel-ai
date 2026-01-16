@@ -1,5 +1,6 @@
-"""Settings management with database persistence."""
+"""Settings management with database persistence and environment variable support."""
 import json
+import os
 from typing import Any, Optional
 from datetime import datetime
 
@@ -13,6 +14,19 @@ from backend.settings.defaults import DEFAULT_SETTINGS
 from backend.settings.validator import SettingsValidator
 
 logger = structlog.get_logger()
+
+# Mapping of setting keys to environment variable names
+# API keys should ALWAYS be loaded from environment variables for security
+ENV_VAR_MAPPING = {
+    ("api_config", "google_api_key"): "GOOGLE_API_KEY",
+    ("api_config", "openai_api_key"): "OPENAI_API_KEY",
+    ("api_config", "anthropic_api_key"): "ANTHROPIC_API_KEY",
+    ("api_config", "mistral_api_key"): "MISTRAL_API_KEY",
+    ("api_config", "xai_api_key"): "XAI_API_KEY",
+    ("api_config", "alpha_vantage_api_key"): "ALPHA_VANTAGE_API_KEY",
+    ("api_config", "news_api_key"): "NEWS_API_KEY",
+    ("api_config", "fred_api_key"): "FRED_API_KEY",
+}
 
 
 class SettingsManager:
@@ -36,6 +50,9 @@ class SettingsManager:
         """
         Get a setting value by key.
 
+        For API keys, environment variables take priority over database values.
+        This ensures secrets are loaded from .env files, not stored in the database.
+
         Args:
             key: The setting key
             category: Optional category to narrow search
@@ -44,6 +61,14 @@ class SettingsManager:
         Returns:
             The setting value (type-coerced) or default
         """
+        # Check environment variable first for sensitive API keys
+        if category:
+            env_var = ENV_VAR_MAPPING.get((category, key))
+            if env_var:
+                env_value = os.environ.get(env_var)
+                if env_value:
+                    return env_value
+
         if category:
             result = await self.db.execute(
                 select(Setting).where(
@@ -83,6 +108,53 @@ class SettingsManager:
         elif value_type == "json":
             return json.loads(value)
         return value
+
+    async def get_api_key_status(self) -> dict[str, dict[str, Any]]:
+        """
+        Get the configuration status of all API keys.
+
+        Returns status of each provider's API key:
+        - configured: bool - whether the key is set
+        - source: "env" | "database" | None - where the key comes from
+
+        This method NEVER returns actual key values for security.
+        """
+        status = {}
+
+        for (category, key), env_var in ENV_VAR_MAPPING.items():
+            provider = key.replace("_api_key", "")
+
+            # Check environment variable first
+            env_value = os.environ.get(env_var)
+            if env_value and env_value.strip():
+                status[provider] = {
+                    "configured": True,
+                    "source": "env",
+                    "env_var": env_var,
+                }
+            else:
+                # Check database
+                result = await self.db.execute(
+                    select(Setting).where(
+                        and_(Setting.category == category, Setting.key == key)
+                    )
+                )
+                setting = result.scalar_one_or_none()
+
+                if setting and setting.value and setting.value.strip():
+                    status[provider] = {
+                        "configured": True,
+                        "source": "database",
+                        "env_var": env_var,
+                    }
+                else:
+                    status[provider] = {
+                        "configured": False,
+                        "source": None,
+                        "env_var": env_var,
+                    }
+
+        return status
 
     async def get_all(self, category: Optional[str] = None) -> dict[str, Any]:
         """

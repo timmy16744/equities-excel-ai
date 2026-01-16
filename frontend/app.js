@@ -259,6 +259,7 @@ class EquitiesExcelApp {
         this.selectedProvider = 'google';
         this.selectedModel = 'gemini-3-flash';
         this.providerApiKeys = {};
+        this.providerApiKeyStatus = {}; // Track API key sources (env vs database)
         this.agentModels = {};
 
         // Modal controls
@@ -282,9 +283,18 @@ class EquitiesExcelApp {
     }
 
     // Show Model Configuration Modal
-    showModelConfigModal() {
+    async showModelConfigModal() {
         const modal = document.getElementById('model-config-modal');
         modal?.classList.remove('hidden');
+
+        // Fetch API key status from backend
+        try {
+            const response = await api.getApiKeyStatus();
+            this.providerApiKeyStatus = response?.api_keys || {};
+        } catch (error) {
+            console.warn('Could not fetch API key status:', error);
+            this.providerApiKeyStatus = {};
+        }
 
         // Populate providers
         this.renderProviderGrid();
@@ -306,12 +316,24 @@ class EquitiesExcelApp {
         const providers = Object.entries(AI_PROVIDERS);
         grid.innerHTML = providers.map(([id, provider]) => {
             const modelCount = Object.keys(provider.models).length;
-            const hasKey = this.providerApiKeys[id] ? 'has-key' : '';
+            const keyStatus = this.providerApiKeyStatus[id] || {};
+            const hasKey = keyStatus.configured ? 'has-key' : '';
+            const keySource = keyStatus.source;
             const selected = this.selectedProvider === id ? 'selected' : '';
+
+            // Show different indicator based on key source
+            let keyIndicator = '';
+            if (keyStatus.configured) {
+                if (keySource === 'env') {
+                    keyIndicator = '<span class="key-source env" title="Configured via .env file (secure)">ENV</span>';
+                } else if (keySource === 'database') {
+                    keyIndicator = '<span class="key-source db" title="Configured via database">DB</span>';
+                }
+            }
 
             return `
                 <div class="provider-card ${selected} ${hasKey}" data-provider="${id}">
-                    <div class="provider-name">${provider.name}</div>
+                    <div class="provider-name">${provider.name} ${keyIndicator}</div>
                     <div class="provider-model-count">${modelCount} models</div>
                 </div>
             `;
@@ -336,16 +358,43 @@ class EquitiesExcelApp {
         document.getElementById('selected-provider-name').textContent = provider?.name || 'Provider';
 
         const keyInput = document.getElementById('provider-api-key');
-        const storedKey = this.providerApiKeys[this.selectedProvider];
-        keyInput.value = storedKey || '';
-
+        const keyStatus = this.providerApiKeyStatus[this.selectedProvider] || {};
         const status = document.getElementById('api-key-status');
-        if (storedKey) {
-            status.textContent = '✓ API key configured';
-            status.className = 'api-key-status success';
+
+        // If key is set via environment variable, show that and disable input
+        if (keyStatus.configured && keyStatus.source === 'env') {
+            keyInput.value = '';
+            keyInput.placeholder = 'Configured via .env file (secure)';
+            keyInput.disabled = true;
+            status.innerHTML = `
+                <span class="status-icon">&#128274;</span>
+                API key configured via environment variable <code>${keyStatus.env_var}</code>
+                <br><small>This is the recommended secure approach. Key cannot be viewed or changed here.</small>
+            `;
+            status.className = 'api-key-status success env-configured';
+            document.getElementById('save-api-key').disabled = true;
         } else {
-            status.textContent = 'No API key configured';
-            status.className = 'api-key-status';
+            keyInput.disabled = false;
+            keyInput.placeholder = 'Enter API key...';
+            document.getElementById('save-api-key').disabled = false;
+
+            if (keyStatus.configured && keyStatus.source === 'database') {
+                keyInput.value = '';
+                keyInput.placeholder = 'Key stored in database (enter new key to update)';
+                status.innerHTML = `
+                    <span class="status-icon">&#9888;</span>
+                    API key stored in database
+                    <br><small>For better security, set <code>${keyStatus.env_var}</code> in your .env file instead.</small>
+                `;
+                status.className = 'api-key-status warning';
+            } else {
+                keyInput.value = '';
+                status.innerHTML = `
+                    No API key configured
+                    <br><small>Recommended: Set <code>${keyStatus.env_var || 'PROVIDER_API_KEY'}</code> in your .env file</small>
+                `;
+                status.className = 'api-key-status';
+            }
         }
     }
 

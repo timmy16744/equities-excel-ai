@@ -964,6 +964,15 @@ class EquitiesAPI {
         return [];
     }
 
+    // Get API key configuration status (shows which keys are set via env vs database)
+    async getApiKeyStatus() {
+        const response = await this.request('/api/settings/api-keys/status');
+        if (response.ok) {
+            return response.json();
+        }
+        return { api_keys: {} };
+    }
+
     // Portfolio endpoints
     async getPortfolio() {
         const response = await this.request('/api/portfolio');

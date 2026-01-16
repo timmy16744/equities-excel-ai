@@ -69,6 +69,28 @@ async def get_categories(
     }
 
 
+@router.get("/api-keys/status")
+async def get_api_key_status(
+    user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Get the configuration status of all API keys.
+
+    Returns which providers have API keys configured and whether they
+    come from environment variables or the database.
+
+    IMPORTANT: This endpoint NEVER returns actual API key values.
+    For security, API keys should be configured via environment variables (.env file).
+    """
+    manager = SettingsManager(db)
+    status = await manager.get_api_key_status()
+    return {
+        "api_keys": status,
+        "note": "For security, API keys should be set via environment variables in .env file"
+    }
+
+
 @router.get("/{category}")
 async def get_category_settings(
     category: str,
