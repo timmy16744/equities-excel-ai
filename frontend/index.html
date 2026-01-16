@@ -212,6 +212,67 @@
         </div>
     </div>
 
+    <!-- Model Configuration Modal -->
+    <div id="model-config-modal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <span id="model-config-title">AI Model Configuration</span>
+                <button class="modal-close" id="model-config-close">&times;</button>
+            </div>
+            <div class="modal-body" id="model-config-body">
+                <div class="model-config-container">
+                    <!-- Provider Selection -->
+                    <div class="model-config-section">
+                        <h3>Select AI Provider</h3>
+                        <div class="provider-grid" id="provider-grid">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- API Key Input -->
+                    <div class="model-config-section">
+                        <h3>API Key for <span id="selected-provider-name">Selected Provider</span></h3>
+                        <div class="api-key-input-group">
+                            <input type="password" id="provider-api-key" placeholder="Enter API key..." class="api-key-input">
+                            <button class="btn btn-small" id="toggle-api-key-visibility">Show</button>
+                            <button class="btn btn-primary btn-small" id="save-api-key">Save Key</button>
+                        </div>
+                        <div class="api-key-status" id="api-key-status"></div>
+                    </div>
+
+                    <!-- Model Selection -->
+                    <div class="model-config-section">
+                        <h3>Select Model</h3>
+                        <div class="model-grid" id="model-grid">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Model Details -->
+                    <div class="model-config-section">
+                        <h3>Model Details</h3>
+                        <div class="model-details" id="model-details">
+                            <p class="model-details-placeholder">Select a model to view details</p>
+                        </div>
+                    </div>
+
+                    <!-- Agent Model Assignment -->
+                    <div class="model-config-section">
+                        <h3>Assign Models to Agents</h3>
+                        <p class="section-hint">Choose which model each agent should use</p>
+                        <div class="agent-model-grid" id="agent-model-grid">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="model-config-cancel">Cancel</button>
+                <button class="btn btn-primary" id="model-config-save">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast notifications -->
     <div id="toast-container"></div>
 

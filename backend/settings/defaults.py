@@ -3,12 +3,40 @@ from typing import Any
 
 DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
     "api_config": {
+        "google_api_key": {
+            "value": "",
+            "value_type": "string",
+            "description": "Google AI API key for Gemini models (recommended)",
+            "is_sensitive": True,
+            "validation_rules": {"required": False},
+        },
+        "openai_api_key": {
+            "value": "",
+            "value_type": "string",
+            "description": "OpenAI API key for GPT models",
+            "is_sensitive": True,
+            "validation_rules": {"required": False, "pattern": "^sk-.*$"},
+        },
         "anthropic_api_key": {
             "value": "",
             "value_type": "string",
-            "description": "Anthropic API key for Claude access",
+            "description": "Anthropic API key for Claude models",
             "is_sensitive": True,
             "validation_rules": {"required": False, "pattern": "^sk-ant-.*$"},
+        },
+        "mistral_api_key": {
+            "value": "",
+            "value_type": "string",
+            "description": "Mistral AI API key",
+            "is_sensitive": True,
+            "validation_rules": {"required": False},
+        },
+        "xai_api_key": {
+            "value": "",
+            "value_type": "string",
+            "description": "xAI API key for Grok models",
+            "is_sensitive": True,
+            "validation_rules": {"required": False},
         },
         "alpha_vantage_api_key": {
             "value": "",
@@ -54,6 +82,20 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
         },
     },
     "agent_config": {
+        "default_provider": {
+            "value": "google",
+            "value_type": "string",
+            "description": "Default AI provider (google, openai, anthropic, mistral, xai)",
+            "is_sensitive": False,
+            "validation_rules": {"enum": ["google", "openai", "anthropic", "mistral", "xai"]},
+        },
+        "default_model": {
+            "value": "gemini-3-flash",
+            "value_type": "string",
+            "description": "Default model to use for agents",
+            "is_sensitive": False,
+            "validation_rules": None,
+        },
         "macro_enabled": {
             "value": "true",
             "value_type": "boolean",
@@ -62,9 +104,9 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "macro_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
-            "description": "Claude model for Macro Agent",
+            "description": "Model for Macro Agent",
             "is_sensitive": False,
             "validation_rules": None,
         },
@@ -90,7 +132,7 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "geopolitical_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Geopolitical Agent",
             "is_sensitive": False,
@@ -104,7 +146,7 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "commodities_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Commodities Agent",
             "is_sensitive": False,
@@ -118,7 +160,7 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "sentiment_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Sentiment Agent",
             "is_sensitive": False,
@@ -132,7 +174,7 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "fundamentals_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Fundamentals Agent",
             "is_sensitive": False,
@@ -146,7 +188,7 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "technical_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Technical Agent",
             "is_sensitive": False,
@@ -160,14 +202,14 @@ DEFAULT_SETTINGS: dict[str, dict[str, dict[str, Any]]] = {
             "validation_rules": None,
         },
         "risk_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Risk Agent",
             "is_sensitive": False,
             "validation_rules": None,
         },
         "aggregation_model": {
-            "value": "claude-sonnet-4-5-20250929",
+            "value": "gemini-3-flash",
             "value_type": "string",
             "description": "Claude model for Aggregation Engine",
             "is_sensitive": False,

@@ -110,6 +110,9 @@ class EquitiesExcelApp {
 
         // Agent Log Panel controls
         this.setupAgentLogPanel();
+
+        // Model Configuration
+        this.setupModelConfig();
     }
 
     // Setup Agent Log Panel
@@ -249,6 +252,295 @@ class EquitiesExcelApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Setup Model Configuration Modal
+    setupModelConfig() {
+        this.selectedProvider = 'google';
+        this.selectedModel = 'gemini-3-flash';
+        this.providerApiKeys = {};
+        this.agentModels = {};
+
+        // Modal controls
+        document.getElementById('model-config-close')?.addEventListener('click', () => this.hideModelConfigModal());
+        document.getElementById('model-config-cancel')?.addEventListener('click', () => this.hideModelConfigModal());
+        document.getElementById('model-config-save')?.addEventListener('click', () => this.saveModelConfig());
+
+        // API key controls
+        document.getElementById('toggle-api-key-visibility')?.addEventListener('click', (e) => {
+            const input = document.getElementById('provider-api-key');
+            if (input.type === 'password') {
+                input.type = 'text';
+                e.target.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                e.target.textContent = 'Show';
+            }
+        });
+
+        document.getElementById('save-api-key')?.addEventListener('click', () => this.saveProviderApiKey());
+    }
+
+    // Show Model Configuration Modal
+    showModelConfigModal() {
+        const modal = document.getElementById('model-config-modal');
+        modal?.classList.remove('hidden');
+
+        // Populate providers
+        this.renderProviderGrid();
+        this.renderModelGrid();
+        this.renderAgentModelGrid();
+    }
+
+    // Hide Model Configuration Modal
+    hideModelConfigModal() {
+        const modal = document.getElementById('model-config-modal');
+        modal?.classList.add('hidden');
+    }
+
+    // Render Provider Selection Grid
+    renderProviderGrid() {
+        const grid = document.getElementById('provider-grid');
+        if (!grid) return;
+
+        const providers = Object.entries(AI_PROVIDERS);
+        grid.innerHTML = providers.map(([id, provider]) => {
+            const modelCount = Object.keys(provider.models).length;
+            const hasKey = this.providerApiKeys[id] ? 'has-key' : '';
+            const selected = this.selectedProvider === id ? 'selected' : '';
+
+            return `
+                <div class="provider-card ${selected} ${hasKey}" data-provider="${id}">
+                    <div class="provider-name">${provider.name}</div>
+                    <div class="provider-model-count">${modelCount} models</div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click handlers
+        grid.querySelectorAll('.provider-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.selectedProvider = card.dataset.provider;
+                this.renderProviderGrid();
+                this.renderModelGrid();
+                this.updateApiKeySection();
+            });
+        });
+
+        this.updateApiKeySection();
+    }
+
+    // Update API Key Section
+    updateApiKeySection() {
+        const provider = AI_PROVIDERS[this.selectedProvider];
+        document.getElementById('selected-provider-name').textContent = provider?.name || 'Provider';
+
+        const keyInput = document.getElementById('provider-api-key');
+        const storedKey = this.providerApiKeys[this.selectedProvider];
+        keyInput.value = storedKey || '';
+
+        const status = document.getElementById('api-key-status');
+        if (storedKey) {
+            status.textContent = '✓ API key configured';
+            status.className = 'api-key-status success';
+        } else {
+            status.textContent = 'No API key configured';
+            status.className = 'api-key-status';
+        }
+    }
+
+    // Save Provider API Key
+    async saveProviderApiKey() {
+        const key = document.getElementById('provider-api-key').value.trim();
+        if (!key) {
+            this.showToast('Please enter an API key', 'error');
+            return;
+        }
+
+        // Map provider to settings key
+        const keyMap = {
+            google: 'google_api_key',
+            openai: 'openai_api_key',
+            anthropic: 'anthropic_api_key',
+            mistral: 'mistral_api_key',
+            xai: 'xai_api_key'
+        };
+
+        const settingKey = keyMap[this.selectedProvider];
+        if (!settingKey) return;
+
+        try {
+            await api.updateSetting('api_config', settingKey, key);
+            this.providerApiKeys[this.selectedProvider] = key;
+            this.showToast(`${AI_PROVIDERS[this.selectedProvider].name} API key saved`, 'success');
+            this.renderProviderGrid();
+            this.updateApiKeySection();
+        } catch (error) {
+            this.showToast('Failed to save API key', 'error');
+        }
+    }
+
+    // Render Model Selection Grid
+    renderModelGrid() {
+        const grid = document.getElementById('model-grid');
+        if (!grid) return;
+
+        const provider = AI_PROVIDERS[this.selectedProvider];
+        if (!provider) {
+            grid.innerHTML = '<p>Select a provider</p>';
+            return;
+        }
+
+        const models = Object.entries(provider.models);
+        grid.innerHTML = models.map(([id, model]) => {
+            const selected = this.selectedModel === id ? 'selected' : '';
+            const isDefault = model.default ? 'default' : '';
+            const contextK = Math.round(model.contextWindow / 1000);
+            const priceStr = `$${model.inputPrice}/$${model.outputPrice}`;
+
+            return `
+                <div class="model-card ${selected} ${isDefault}" data-model="${id}">
+                    <div class="model-card-name">${model.name}${model.default ? ' ★' : ''}</div>
+                    <div class="model-card-id">${model.id}</div>
+                    <div class="model-card-specs">
+                        <span class="model-spec context">${contextK}K ctx</span>
+                        <span class="model-spec price">${priceStr}/M</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click handlers
+        grid.querySelectorAll('.model-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.selectedModel = card.dataset.model;
+                this.renderModelGrid();
+                this.renderModelDetails();
+            });
+        });
+
+        this.renderModelDetails();
+    }
+
+    // Render Model Details
+    renderModelDetails() {
+        const container = document.getElementById('model-details');
+        if (!container) return;
+
+        const provider = AI_PROVIDERS[this.selectedProvider];
+        const model = provider?.models[this.selectedModel];
+
+        if (!model) {
+            container.innerHTML = '<p class="model-details-placeholder">Select a model to view details</p>';
+            return;
+        }
+
+        const features = model.features || [];
+        container.innerHTML = `
+            <div class="model-details-grid">
+                <div class="model-detail-item">
+                    <span class="model-detail-label">Model ID</span>
+                    <span class="model-detail-value">${model.id}</span>
+                </div>
+                <div class="model-detail-item">
+                    <span class="model-detail-label">Context Window</span>
+                    <span class="model-detail-value">${(model.contextWindow / 1000).toLocaleString()}K tokens</span>
+                </div>
+                <div class="model-detail-item">
+                    <span class="model-detail-label">Max Output</span>
+                    <span class="model-detail-value">${(model.maxOutput / 1000).toLocaleString()}K tokens</span>
+                </div>
+                <div class="model-detail-item">
+                    <span class="model-detail-label">Pricing (per 1M tokens)</span>
+                    <span class="model-detail-value">$${model.inputPrice} input / $${model.outputPrice} output</span>
+                </div>
+                <div class="model-features">
+                    ${features.map(f => `<span class="model-feature-tag">${f}</span>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // Render Agent Model Assignment Grid
+    renderAgentModelGrid() {
+        const grid = document.getElementById('agent-model-grid');
+        if (!grid) return;
+
+        const agents = [
+            { id: 'macro', name: 'Macro Economics' },
+            { id: 'geopolitical', name: 'Geopolitical' },
+            { id: 'commodities', name: 'Commodities' },
+            { id: 'sentiment', name: 'Sentiment' },
+            { id: 'fundamentals', name: 'Fundamentals' },
+            { id: 'technical', name: 'Technical' },
+            { id: 'alternative', name: 'Alternative Data' },
+            { id: 'cross_asset', name: 'Cross-Asset' },
+            { id: 'event', name: 'Event-Driven' },
+            { id: 'execution', name: 'Execution' },
+            { id: 'risk', name: 'Risk Management' },
+            { id: 'aggregation', name: 'Aggregation' },
+            { id: 'learning', name: 'Learning' }
+        ];
+
+        // Build all model options
+        const allModels = [];
+        Object.entries(AI_PROVIDERS).forEach(([providerId, provider]) => {
+            Object.entries(provider.models).forEach(([modelId, model]) => {
+                allModels.push({
+                    id: `${providerId}:${modelId}`,
+                    name: `${provider.name} - ${model.name}`,
+                    modelId: model.id
+                });
+            });
+        });
+
+        grid.innerHTML = agents.map(agent => {
+            const currentModel = this.agentModels[agent.id] || 'google:gemini-3-flash';
+            const options = allModels.map(m =>
+                `<option value="${m.id}" ${currentModel === m.id ? 'selected' : ''}>${m.name}</option>`
+            ).join('');
+
+            return `
+                <div class="agent-model-row">
+                    <span class="agent-model-name">${agent.name}</span>
+                    <select class="agent-model-select" data-agent="${agent.id}">
+                        ${options}
+                    </select>
+                </div>
+            `;
+        }).join('');
+
+        // Add change handlers
+        grid.querySelectorAll('.agent-model-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                this.agentModels[e.target.dataset.agent] = e.target.value;
+            });
+        });
+    }
+
+    // Save Model Configuration
+    async saveModelConfig() {
+        try {
+            // Save default provider and model
+            await api.updateSetting('agent_config', 'default_provider', this.selectedProvider);
+            await api.updateSetting('agent_config', 'default_model', this.selectedModel);
+
+            // Save agent-specific models
+            for (const [agentId, modelKey] of Object.entries(this.agentModels)) {
+                const [provider, model] = modelKey.split(':');
+                const fullModelId = AI_PROVIDERS[provider]?.models[model]?.id || model;
+                await api.updateSetting('agent_config', `${agentId}_model`, fullModelId);
+            }
+
+            this.showToast('Model configuration saved', 'success');
+            this.hideModelConfigModal();
+
+            // Refresh data
+            await this.loadInitialData();
+        } catch (error) {
+            console.error('Failed to save model config:', error);
+            this.showToast('Failed to save configuration', 'error');
+        }
     }
 
     // Setup WebSocket connection

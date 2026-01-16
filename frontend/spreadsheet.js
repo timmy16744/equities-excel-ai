@@ -94,6 +94,24 @@ class SpreadsheetEngine {
                 this.showCellDetails(e.target, row);
             }
         });
+
+        // Single click for action cells
+        this.container.addEventListener('click', (e) => {
+            if (e.target.classList.contains('cells__input') && e.target.dataset.action) {
+                this.handleCellAction(e.target.dataset.action);
+            }
+        });
+    }
+
+    // Handle cell actions
+    handleCellAction(action) {
+        switch (action) {
+            case 'openModelConfig':
+                window.app?.showModelConfigModal();
+                break;
+            default:
+                console.log('Unknown action:', action);
+        }
     }
 
     // Select a cell
@@ -148,6 +166,15 @@ class SpreadsheetEngine {
         // Store raw value for calculations
         cell.dataset.rawValue = value;
         cell.dataset.type = options.type || 'text';
+
+        // Store action if provided
+        if (options.action) {
+            cell.dataset.action = options.action;
+            cell.classList.add('cell-action');
+        } else {
+            delete cell.dataset.action;
+            cell.classList.remove('cell-action');
+        }
     }
 
     // Format numbers based on current format
@@ -592,6 +619,13 @@ class SpreadsheetEngine {
         this.currentView = 'settings';
 
         this.setCell('A1', 'SETTINGS', { type: 'header' });
+
+        // Model Configuration Button
+        this.setCell('C1', '[ Configure AI Models ]', {
+            type: 'action',
+            clickable: true,
+            action: 'openModelConfig'
+        });
 
         const categories = ['api_config', 'agent_config', 'risk_management', 'scheduling', 'performance', 'ui_preferences', 'system'];
         const categoryNames = {

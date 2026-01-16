@@ -1550,3 +1550,338 @@ body.dark-theme .agent-log-entry-message {
 body.dark-theme .agent-log-checkbox {
     color: #aaa;
 }
+
+/* ========================================
+   MODEL CONFIGURATION MODAL
+   ======================================== */
+
+.modal-large {
+    max-width: 900px;
+    width: 95%;
+    max-height: 90vh;
+}
+
+.modal-large .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.model-config-container {
+    padding: 10px;
+}
+
+.model-config-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gray-darker);
+}
+
+.model-config-section:last-child {
+    border-bottom: none;
+}
+
+.model-config-section h3 {
+    color: var(--green);
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.section-hint {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Provider Grid */
+.provider-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.provider-card {
+    padding: 15px;
+    border: 2px solid var(--gray-darker);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+}
+
+.provider-card:hover {
+    border-color: var(--green);
+    transform: translateY(-2px);
+}
+
+.provider-card.selected {
+    border-color: var(--green);
+    background: rgba(33, 115, 70, 0.1);
+}
+
+.provider-card.has-key {
+    position: relative;
+}
+
+.provider-card.has-key::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    color: var(--green);
+    font-weight: bold;
+}
+
+.provider-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.provider-model-count {
+    font-size: 11px;
+    color: #666;
+}
+
+/* API Key Input */
+.api-key-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.api-key-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--gray-darker);
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.api-key-input:focus {
+    outline: none;
+    border-color: var(--green);
+}
+
+.api-key-status {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.api-key-status.success {
+    color: var(--green);
+}
+
+.api-key-status.error {
+    color: var(--bearish);
+}
+
+.btn-small {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+/* Model Grid */
+.model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.model-card {
+    padding: 12px;
+    border: 2px solid var(--gray-darker);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+}
+
+.model-card:hover {
+    border-color: var(--green);
+}
+
+.model-card.selected {
+    border-color: var(--green);
+    background: rgba(33, 115, 70, 0.1);
+}
+
+.model-card.default {
+    border-color: #f39c12;
+}
+
+.model-card-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.model-card-id {
+    font-size: 10px;
+    color: #888;
+    font-family: monospace;
+    margin-bottom: 8px;
+}
+
+.model-card-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.model-spec {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--gray);
+}
+
+.model-spec.context {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.model-spec.price {
+    background: rgba(39, 174, 96, 0.2);
+    color: #27ae60;
+}
+
+/* Model Details */
+.model-details {
+    background: var(--gray);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.model-details-placeholder {
+    color: #888;
+    text-align: center;
+    font-style: italic;
+}
+
+.model-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.model-detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.model-detail-label {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.model-detail-value {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.model-features {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.model-feature-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba(33, 115, 70, 0.15);
+    color: var(--green);
+}
+
+/* Agent Model Assignment */
+.agent-model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+}
+
+.agent-model-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--gray);
+    border-radius: 6px;
+}
+
+.agent-model-name {
+    flex: 0 0 120px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.agent-model-select {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--gray-darker);
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--white);
+}
+
+.agent-model-select:focus {
+    outline: none;
+    border-color: var(--green);
+}
+
+/* Dark theme */
+body.dark-theme .provider-card,
+body.dark-theme .model-card {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+body.dark-theme .provider-card:hover,
+body.dark-theme .model-card:hover {
+    border-color: var(--green);
+}
+
+body.dark-theme .provider-card.selected,
+body.dark-theme .model-card.selected {
+    background: rgba(33, 115, 70, 0.2);
+}
+
+body.dark-theme .api-key-input {
+    background: #333;
+    border-color: #555;
+    color: #eee;
+}
+
+body.dark-theme .model-details {
+    background: #2d2d2d;
+}
+
+body.dark-theme .agent-model-row {
+    background: #2d2d2d;
+}
+
+body.dark-theme .agent-model-select {
+    background: #333;
+    border-color: #555;
+    color: #eee;
+}
+
+/* Action cells (clickable buttons in grid) */
+.cell-action {
+    background: linear-gradient(180deg, var(--green) 0%, #1a5f3c 100%) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    border-radius: 4px !important;
+    text-align: center !important;
+}
+
+.cell-action:hover {
+    background: linear-gradient(180deg, #2a8f5a 0%, var(--green) 100%) !important;
+}
