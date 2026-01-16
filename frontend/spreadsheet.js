@@ -621,11 +621,12 @@ class SpreadsheetEngine {
             Object.entries(settings).forEach(([key, setting]) => {
                 if (currentRow > this.rows) return;
 
-                const value = setting.is_sensitive ? '********' : setting.value;
+                const displayValue = setting.is_sensitive ? '********' :
+                    (setting.value !== null && setting.value !== undefined ? String(setting.value) : '--');
 
                 this.setCell(`A${currentRow}`, key, { type: 'label' });
-                this.setCell(`B${currentRow}`, String(value), { type: 'neutral', clickable: !setting.is_sensitive });
-                this.setCell(`C${currentRow}`, setting.type || 'string', { type: 'neutral' });
+                this.setCell(`B${currentRow}`, displayValue, { type: 'neutral', clickable: !setting.is_sensitive });
+                this.setCell(`C${currentRow}`, setting.value_type || setting.type || 'string', { type: 'neutral' });
                 this.setCell(`D${currentRow}`, setting.description || '--', { type: 'neutral' });
                 currentRow++;
             });

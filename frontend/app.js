@@ -326,13 +326,14 @@ class EquitiesExcelApp {
             ]);
 
             // Update spreadsheet data
+            // Note: API returns { settings: {...} } so we unwrap it
             this.spreadsheet.updateData({
                 agents: agents || {},
                 insight: insight,
                 portfolio: portfolio,
                 positions: positions || [],
                 signals: signals || [],
-                settings: settings || {},
+                settings: settings?.settings || settings || {},
                 performance: performance,
                 weights: weights || {},
                 risk: risk,
