@@ -9,6 +9,7 @@ from backend.database import get_db, User
 from backend.settings import SettingsManager, SettingsValidator
 from backend.api.websocket import broadcast_settings_change
 from backend.api.auth_routes import get_current_active_user, require_admin
+from backend.utils.env_manager import get_env_manager, SETTING_TO_ENV_MAP
 
 router = APIRouter()
 
@@ -37,6 +38,12 @@ class SettingsImport(BaseModel):
     """Request model for importing settings."""
     settings: dict
     skip_sensitive: bool = True
+
+
+class ApiKeyUpdate(BaseModel):
+    """Request model for updating an API key in .env file."""
+    provider: str
+    api_key: str
 
 
 @router.get("")
@@ -72,7 +79,6 @@ async def get_categories(
 @router.get("/api-keys/status")
 async def get_api_key_status(
     user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
     Get the configuration status of all API keys.
@@ -81,14 +87,98 @@ async def get_api_key_status(
     come from environment variables or the database.
 
     IMPORTANT: This endpoint NEVER returns actual API key values.
-    For security, API keys should be configured via environment variables (.env file).
     """
-    manager = SettingsManager(db)
-    status = await manager.get_api_key_status()
+    env_manager = get_env_manager()
+    status = env_manager.get_all_api_keys_status()
     return {
         "api_keys": status,
-        "note": "For security, API keys should be set via environment variables in .env file"
+        "note": "API keys are stored in the .env file for security"
     }
+
+
+@router.put("/api-keys/{provider}")
+async def update_api_key(
+    provider: str,
+    data: ApiKeyUpdate,
+    admin: User = Depends(require_admin),
+) -> dict:
+    """
+    Update an API key in the .env file.
+
+    This endpoint writes directly to the .env file, which is the secure
+    way to store API keys. The key will be immediately available to the
+    application without restart.
+
+    Args:
+        provider: Provider name (google, openai, anthropic, mistral, xai, etc.)
+        data: ApiKeyUpdate with the new API key
+
+    Returns:
+        Status of the update
+    """
+    # Map provider to setting key
+    setting_key = f"{provider}_api_key"
+    env_manager = get_env_manager()
+
+    # Get the environment variable name
+    env_var = env_manager.setting_key_to_env_var(setting_key)
+    if not env_var:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown provider: {provider}. Valid providers: google, openai, anthropic, mistral, xai, alpha_vantage, news, fred"
+        )
+
+    try:
+        env_manager.set(env_var, data.api_key)
+        return {
+            "status": "updated",
+            "provider": provider,
+            "env_var": env_var,
+            "message": f"API key for {provider} saved to .env file"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Cannot write to .env file: {str(e)}"
+        )
+
+
+@router.delete("/api-keys/{provider}")
+async def delete_api_key(
+    provider: str,
+    admin: User = Depends(require_admin),
+) -> dict:
+    """
+    Remove an API key from the .env file.
+
+    Args:
+        provider: Provider name
+
+    Returns:
+        Status of the deletion
+    """
+    setting_key = f"{provider}_api_key"
+    env_manager = get_env_manager()
+
+    env_var = env_manager.setting_key_to_env_var(setting_key)
+    if not env_var:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown provider: {provider}"
+        )
+
+    try:
+        env_manager.delete(env_var)
+        return {
+            "status": "deleted",
+            "provider": provider,
+            "env_var": env_var,
+            "message": f"API key for {provider} removed from .env file"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/{category}")

@@ -973,6 +973,31 @@ class EquitiesAPI {
         return { api_keys: {} };
     }
 
+    // Update an API key in the .env file
+    async updateApiKey(provider, apiKey) {
+        const response = await this.request(`/api/settings/api-keys/${provider}`, {
+            method: 'PUT',
+            body: JSON.stringify({ provider, api_key: apiKey })
+        });
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.detail || 'Failed to update API key');
+        }
+        return response.json();
+    }
+
+    // Delete an API key from the .env file
+    async deleteApiKey(provider) {
+        const response = await this.request(`/api/settings/api-keys/${provider}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.detail || 'Failed to delete API key');
+        }
+        return response.json();
+    }
+
     // Portfolio endpoints
     async getPortfolio() {
         const response = await this.request('/api/portfolio');

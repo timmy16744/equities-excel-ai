@@ -360,45 +360,50 @@ class EquitiesExcelApp {
         const keyInput = document.getElementById('provider-api-key');
         const keyStatus = this.providerApiKeyStatus[this.selectedProvider] || {};
         const status = document.getElementById('api-key-status');
+        const saveBtn = document.getElementById('save-api-key');
 
-        // If key is set via environment variable, show that and disable input
+        // Get env var name for this provider
+        const envVarMap = {
+            google: 'GOOGLE_API_KEY',
+            openai: 'OPENAI_API_KEY',
+            anthropic: 'ANTHROPIC_API_KEY',
+            mistral: 'MISTRAL_API_KEY',
+            xai: 'XAI_API_KEY'
+        };
+        const envVar = keyStatus.env_var || envVarMap[this.selectedProvider] || 'API_KEY';
+
+        // Always allow input - user can update/change the key
+        keyInput.disabled = false;
+        keyInput.value = '';
+        saveBtn.disabled = false;
+
         if (keyStatus.configured && keyStatus.source === 'env') {
-            keyInput.value = '';
-            keyInput.placeholder = 'Configured via .env file (secure)';
-            keyInput.disabled = true;
+            keyInput.placeholder = 'Enter new key to update...';
             status.innerHTML = `
                 <span class="status-icon">&#128274;</span>
-                API key configured via environment variable <code>${keyStatus.env_var}</code>
-                <br><small>This is the recommended secure approach. Key cannot be viewed or changed here.</small>
+                API key configured in <code>.env</code> file
+                <br><small>Variable: <code>${envVar}</code> - Enter a new key above to update it.</small>
             `;
             status.className = 'api-key-status success env-configured';
-            document.getElementById('save-api-key').disabled = true;
+        } else if (keyStatus.configured && keyStatus.source === 'database') {
+            keyInput.placeholder = 'Enter key to save to .env file...';
+            status.innerHTML = `
+                <span class="status-icon">&#9888;</span>
+                API key stored in database (legacy)
+                <br><small>Enter key above to migrate to <code>${envVar}</code> in .env file.</small>
+            `;
+            status.className = 'api-key-status warning';
         } else {
-            keyInput.disabled = false;
             keyInput.placeholder = 'Enter API key...';
-            document.getElementById('save-api-key').disabled = false;
-
-            if (keyStatus.configured && keyStatus.source === 'database') {
-                keyInput.value = '';
-                keyInput.placeholder = 'Key stored in database (enter new key to update)';
-                status.innerHTML = `
-                    <span class="status-icon">&#9888;</span>
-                    API key stored in database
-                    <br><small>For better security, set <code>${keyStatus.env_var}</code> in your .env file instead.</small>
-                `;
-                status.className = 'api-key-status warning';
-            } else {
-                keyInput.value = '';
-                status.innerHTML = `
-                    No API key configured
-                    <br><small>Recommended: Set <code>${keyStatus.env_var || 'PROVIDER_API_KEY'}</code> in your .env file</small>
-                `;
-                status.className = 'api-key-status';
-            }
+            status.innerHTML = `
+                No API key configured
+                <br><small>Enter your API key to save it to <code>${envVar}</code> in .env file.</small>
+            `;
+            status.className = 'api-key-status';
         }
     }
 
-    // Save Provider API Key
+    // Save Provider API Key to .env file
     async saveProviderApiKey() {
         const key = document.getElementById('provider-api-key').value.trim();
         if (!key) {
@@ -406,26 +411,28 @@ class EquitiesExcelApp {
             return;
         }
 
-        // Map provider to settings key
-        const keyMap = {
-            google: 'google_api_key',
-            openai: 'openai_api_key',
-            anthropic: 'anthropic_api_key',
-            mistral: 'mistral_api_key',
-            xai: 'xai_api_key'
-        };
-
-        const settingKey = keyMap[this.selectedProvider];
-        if (!settingKey) return;
+        const providerName = AI_PROVIDERS[this.selectedProvider]?.name || this.selectedProvider;
 
         try {
-            await api.updateSetting('api_config', settingKey, key);
-            this.providerApiKeys[this.selectedProvider] = key;
-            this.showToast(`${AI_PROVIDERS[this.selectedProvider].name} API key saved`, 'success');
+            // Save to .env file via new API endpoint
+            const result = await api.updateApiKey(this.selectedProvider, key);
+
+            // Update local status
+            this.providerApiKeyStatus[this.selectedProvider] = {
+                configured: true,
+                source: 'env',
+                env_var: result.env_var
+            };
+
+            this.showToast(`${providerName} API key saved to .env file`, 'success');
             this.renderProviderGrid();
             this.updateApiKeySection();
+
+            // Clear the input for security
+            document.getElementById('provider-api-key').value = '';
         } catch (error) {
-            this.showToast('Failed to save API key', 'error');
+            console.error('Failed to save API key:', error);
+            this.showToast(error.message || 'Failed to save API key', 'error');
         }
     }
 
