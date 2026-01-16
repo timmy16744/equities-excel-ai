@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equities AI - Excel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Merriweather:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="main-content">
+        <div class="title">Equities AI - Excel</div>
+        <div class="menu-bar">
+            <div data-view="dashboard"><span>Dashboard</span></div>
+            <div data-view="agents"><span>Agents</span></div>
+            <div data-view="portfolio"><span>Portfolio</span></div>
+            <div data-view="performance"><span>Performance</span></div>
+            <div data-view="signals"><span>Signals</span></div>
+            <div data-view="risk"><span>Risk</span></div>
+            <div data-view="execution"><span>Execution</span></div>
+            <div data-view="settings"><span>Settings</span></div>
+            <div data-view="help"><span>Help</span></div>
+        </div>
+        <div class="icon-bar">
+            <div class="icon-bar__clipboard">
+                <div class="icon-paste" id="btn-analyze">
+                    <div class="icon"></div>
+                    <span>Analyze</span>
+                </div>
+                <div class="icon icon-cut" id="btn-refresh" title="Refresh Data"></div>
+                <div class="icon icon-copy" id="btn-export" title="Export Report"></div>
+                <div class="icon-bar__name">Actions</div>
+            </div>
+            <div class="icon-bar__font">
+                <select class="agent-filter" id="agent-filter">
+                    <option value="all" selected>All Agents</option>
+                    <option value="macro">Macro Economics</option>
+                    <option value="geopolitical">Geopolitical</option>
+                    <option value="commodities">Commodities</option>
+                    <option value="sentiment">Sentiment</option>
+                    <option value="fundamentals">Fundamentals</option>
+                    <option value="technical">Technical</option>
+                    <option value="alternative">Alternative Data</option>
+                    <option value="cross_asset">Cross-Asset</option>
+                    <option value="event">Event-Driven</option>
+                    <option value="risk">Risk</option>
+                    <option value="aggregation">Aggregation</option>
+                    <option value="learning">Learning</option>
+                </select>
+                <select class="timeframe-filter" id="timeframe-filter">
+                    <option value="1d">1 Day</option>
+                    <option value="1w" selected>1 Week</option>
+                    <option value="1m">1 Month</option>
+                    <option value="3m">3 Months</option>
+                </select>
+                <div class="icon icon-bold" id="btn-bullish" title="Filter Bullish"></div>
+                <div class="icon icon-italic" id="btn-neutral" title="Filter Neutral"></div>
+                <div class="icon icon-underline" id="btn-bearish" title="Filter Bearish"></div>
+                <div class="icon icon-border" id="btn-grid-lines" title="Toggle Grid"></div>
+                <div class="icon icon-fill" id="btn-theme" title="Toggle Theme"></div>
+                <div class="icon icon-color" id="btn-highlight" title="Highlight Alerts"></div>
+                <div class="icon-bar__name">Filters</div>
+            </div>
+            <div class="icon-bar__alignment">
+                <div class="icon icon-alignt" id="btn-sort-asc" title="Sort Ascending"></div>
+                <div class="icon icon-alignm" id="btn-sort-desc" title="Sort Descending"></div>
+                <div class="icon icon-alignb" id="btn-sort-default" title="Default Sort"></div>
+                <div class="icon icon-orientation" id="btn-rotate-view" title="Rotate View"></div>
+                <div class="icon icon-alignl" id="btn-align-left" title="Align Left"></div>
+                <div class="icon icon-alignc" id="btn-align-center" title="Align Center"></div>
+                <div class="icon icon-alignr" id="btn-align-right" title="Align Right"></div>
+                <div class="icon icon-indentinc" id="btn-zoom-in" title="Zoom In"></div>
+                <div class="icon icon-indentdec" id="btn-zoom-out" title="Zoom Out"></div>
+                <div class="wrap-text" id="btn-wrap">
+                    <div class="icon"></div>
+                    <span>Auto-Refresh</span>
+                </div>
+                <div class="merge-center" id="btn-merge">
+                    <div class="icon"></div>
+                    <span>Consolidate View</span>
+                </div>
+                <div class="icon-bar__name">Display</div>
+            </div>
+            <div class="icon-bar__number">
+                <select class="number-format" id="number-format">
+                    <option value="general">General</option>
+                    <option value="number">Number</option>
+                    <option value="currency" selected>Currency</option>
+                    <option value="percent">Percentage</option>
+                    <option value="scientific">Scientific</option>
+                </select>
+                <div class="icon icon-acc" id="btn-dollar" title="Dollar Format"></div>
+                <div class="icon icon-percent" id="btn-percent" title="Percent Format"></div>
+                <div class="icon icon-comma" id="btn-comma" title="Comma Format"></div>
+                <div class="icon icon-decimalinc" id="btn-decimal-inc" title="Increase Decimals"></div>
+                <div class="icon icon-decimaldec" id="btn-decimal-dec" title="Decrease Decimals"></div>
+                <div class="icon-bar__name">Format</div>
+            </div>
+            <div class="icon-bar__styles">
+                <div class="conditional" id="btn-conditional" title="Risk Alerts">
+                    <div class="icon"></div>
+                </div>
+                <div class="format-table" id="btn-format-table" title="Portfolio View">
+                    <div class="icon"></div>
+                </div>
+                <div class="cell-style" id="btn-cell-style" title="Agent Styles">
+                    <div class="icon"></div>
+                </div>
+                <div class="icon-desc">Risk Alerts</div>
+                <div class="icon-desc">Portfolio View</div>
+                <div class="icon-desc">Agent Styles</div>
+                <div class="icon-bar__name">Views</div>
+            </div>
+            <div class="icon-bar__cells">
+                <div class="cell-insert" id="btn-add-position" title="Add Position">
+                    <div class="icon"></div>
+                </div>
+                <div class="cell-delete" id="btn-remove-position" title="Remove Position">
+                    <div class="icon"></div>
+                </div>
+                <div class="cell-format" id="btn-edit-position" title="Edit Position">
+                    <div class="icon"></div>
+                </div>
+                <div class="icon-desc">Add Signal</div>
+                <div class="icon-desc">Remove</div>
+                <div class="icon-desc">Edit</div>
+                <div class="icon-bar__name">Positions</div>
+            </div>
+        </div>
+        <div class="cell-content">
+            <div>fx</div>
+            <div id="formula-bar">
+                <span id="formula-display">=AGENT_CONSENSUS("ALL", "OUTLOOK")</span>
+            </div>
+        </div>
+        <div class="cells" id="spreadsheet">
+            <!-- Grid will be generated by JavaScript -->
+        </div>
+        <div class="sheet-tabs">
+            <div class="sheet-tab active" data-sheet="main">Dashboard</div>
+            <div class="sheet-tab" data-sheet="agents">Agent Details</div>
+            <div class="sheet-tab" data-sheet="positions">Positions</div>
+            <div class="sheet-tab" data-sheet="history">History</div>
+            <div class="sheet-tab" data-sheet="config">Configuration</div>
+        </div>
+        <div class="status-bar">
+            <div class="status-left">
+                <span id="connection-status" class="status-indicator disconnected">Disconnected</span>
+                <span id="last-update">Last update: --</span>
+            </div>
+            <div class="status-center">
+                <span id="market-status">Market: --</span>
+                <span id="workflow-status">Workflow: Idle</span>
+            </div>
+            <div class="status-right">
+                <span id="cell-info">Ready</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for detailed views -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modal-title">Details</span>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="modal-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container"></div>
+
+    <!-- Chart container (hidden, used for rendering) -->
+    <canvas id="chart-canvas" class="hidden"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="api.js"></script>
+    <script src="websocket.js"></script>
+    <script src="spreadsheet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
