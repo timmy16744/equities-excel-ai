@@ -1288,3 +1288,265 @@ body.dark-theme ::-webkit-scrollbar-thumb {
 body.dark-theme .help-content kbd {
     background: var(--gray-dark);
 }
+
+/* ========================================
+   AGENT THOUGHTS LOG PANEL
+   ======================================== */
+
+.agent-log-panel {
+    position: fixed;
+    bottom: 25px;
+    right: 10px;
+    width: 450px;
+    max-height: 400px;
+    background: var(--white);
+    border: 1px solid var(--gray-darker);
+    border-radius: 8px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: max-height 0.3s ease;
+}
+
+.agent-log-panel.collapsed {
+    max-height: 40px;
+}
+
+.agent-log-panel.collapsed .agent-log-content {
+    display: none;
+}
+
+.agent-log-panel.collapsed .agent-log-expand {
+    transform: rotate(180deg);
+}
+
+.agent-log-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: linear-gradient(180deg, var(--green) 0%, #1a5f3c 100%);
+    color: white;
+    cursor: pointer;
+    border-radius: 7px 7px 0 0;
+    user-select: none;
+}
+
+.agent-log-panel.collapsed .agent-log-header {
+    border-radius: 7px;
+}
+
+.agent-log-title {
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+}
+
+.agent-log-badge {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.agent-log-expand {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.agent-log-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.agent-log-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--gray);
+    border-bottom: 1px solid var(--gray-darker);
+}
+
+.agent-log-controls select {
+    padding: 4px 8px;
+    border: 1px solid var(--gray-darker);
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--white);
+}
+
+.agent-log-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+}
+
+.agent-log-checkbox input {
+    cursor: pointer;
+}
+
+.agent-log-btn {
+    padding: 4px 10px;
+    border: 1px solid var(--gray-darker);
+    border-radius: 4px;
+    background: var(--white);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.agent-log-btn:hover {
+    background: var(--gray);
+}
+
+.agent-log-entries {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    max-height: 280px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.agent-log-empty {
+    color: #888;
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
+}
+
+.agent-log-entry {
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    border-left: 3px solid var(--gray-darker);
+    background: var(--gray);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.agent-log-entry.macro { border-left-color: #3498db; }
+.agent-log-entry.geopolitical { border-left-color: #e74c3c; }
+.agent-log-entry.commodities { border-left-color: #f39c12; }
+.agent-log-entry.sentiment { border-left-color: #9b59b6; }
+.agent-log-entry.fundamentals { border-left-color: #1abc9c; }
+.agent-log-entry.technical { border-left-color: #34495e; }
+.agent-log-entry.alternative { border-left-color: #e91e63; }
+.agent-log-entry.cross_asset { border-left-color: #00bcd4; }
+.agent-log-entry.event { border-left-color: #ff5722; }
+.agent-log-entry.execution { border-left-color: #795548; }
+.agent-log-entry.risk { border-left-color: #f44336; }
+.agent-log-entry.aggregation { border-left-color: var(--green); }
+.agent-log-entry.learning { border-left-color: #673ab7; }
+.agent-log-entry.system { border-left-color: #607d8b; }
+
+.agent-log-entry-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.agent-log-entry-agent {
+    font-weight: 600;
+    color: #333;
+    text-transform: capitalize;
+}
+
+.agent-log-entry-time {
+    color: #888;
+    font-size: 11px;
+}
+
+.agent-log-entry-message {
+    color: #555;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.agent-log-entry-type {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.agent-log-entry-type.thinking {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.agent-log-entry-type.analyzing {
+    background: rgba(243, 156, 18, 0.2);
+    color: #f39c12;
+}
+
+.agent-log-entry-type.complete {
+    background: rgba(39, 174, 96, 0.2);
+    color: #27ae60;
+}
+
+.agent-log-entry-type.error {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.agent-log-entry-type.warning {
+    background: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+}
+
+/* Dark theme adjustments */
+body.dark-theme .agent-log-panel {
+    background: #1e1e1e;
+    border-color: #444;
+}
+
+body.dark-theme .agent-log-controls {
+    background: #2d2d2d;
+    border-color: #444;
+}
+
+body.dark-theme .agent-log-controls select,
+body.dark-theme .agent-log-btn {
+    background: #333;
+    border-color: #555;
+    color: #ddd;
+}
+
+body.dark-theme .agent-log-entry {
+    background: #2d2d2d;
+}
+
+body.dark-theme .agent-log-entry-agent {
+    color: #eee;
+}
+
+body.dark-theme .agent-log-entry-message {
+    color: #bbb;
+}
+
+body.dark-theme .agent-log-checkbox {
+    color: #aaa;
+}

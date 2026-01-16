@@ -12,6 +12,7 @@ from backend.database import AgentPrediction
 from backend.settings import SettingsManager
 from backend.utils.anthropic_client import AnthropicClient, get_anthropic_client
 from backend.utils.schemas import AgentOutput, Outlook, Timeframe, AgentForecast
+from backend.api.websocket import broadcast_agent_thought, broadcast_agent_status
 
 logger = structlog.get_logger()
 
@@ -202,9 +203,13 @@ Base your analysis only on the provided data."""
         """
         self._logger.info("Starting agent run", force_refresh=force_refresh)
 
+        # Broadcast starting status
+        await broadcast_agent_status(self.agent_id, "starting", f"Initializing {self.agent_id} analysis...")
+
         # Check if enabled
         if not await self.is_enabled():
             self._logger.info("Agent is disabled")
+            await broadcast_agent_status(self.agent_id, "warning", f"Agent {self.agent_id} is disabled in settings")
             return AgentResult(
                 success=False,
                 error=f"Agent {self.agent_id} is disabled in settings",
@@ -215,18 +220,23 @@ Base your analysis only on the provided data."""
             cached = await self._get_cached_output()
             if cached:
                 self._logger.info("Returning cached output")
+                await broadcast_agent_thought(self.agent_id, "Using cached analysis results", "thinking")
                 return AgentResult(success=True, output=cached, cached=True)
 
         try:
             # Fetch data
             self._logger.info("Fetching data")
+            await broadcast_agent_thought(self.agent_id, "Fetching market data from external sources...", "thinking")
             data = await self.fetch_data()
 
             if not data:
+                await broadcast_agent_status(self.agent_id, "error", "Failed to fetch required data")
                 return AgentResult(
                     success=False,
                     error="Failed to fetch required data",
                 )
+
+            await broadcast_agent_thought(self.agent_id, f"Data collection complete. Analyzing {len(data)} data points...", "analyzing")
 
             # Build prompt and call Claude
             prompt = self.build_prompt(data)
@@ -234,6 +244,8 @@ Base your analysis only on the provided data."""
             max_tokens = await self.get_max_tokens()
 
             self._logger.info("Calling Claude", model=model)
+            await broadcast_agent_thought(self.agent_id, f"Running AI analysis with {model}...", "analyzing")
+
             response = await self.claude.complete(
                 model=model,
                 system=self.get_system_prompt(),
@@ -244,9 +256,11 @@ Base your analysis only on the provided data."""
             # Handle mock response
             if response.get("is_mock"):
                 self._logger.warning("Using mock response (no API key)")
+                await broadcast_agent_thought(self.agent_id, "Using simulated analysis (no API key configured)", "warning")
                 output = self._create_mock_output()
             else:
                 # Parse response
+                await broadcast_agent_thought(self.agent_id, "Processing AI response and extracting insights...", "analyzing")
                 output = self.parse_response(response["content"], data)
 
             # Cache the output
@@ -254,6 +268,11 @@ Base your analysis only on the provided data."""
 
             # Save to database
             await self._save_prediction(output)
+
+            # Broadcast completion with summary
+            summary = f"Analysis complete: {output.forecast.outlook.value.upper()} outlook with {output.forecast.confidence:.0%} confidence"
+            await broadcast_agent_status(self.agent_id, "complete", summary)
+            await broadcast_agent_thought(self.agent_id, output.summary[:200] + "..." if len(output.summary) > 200 else output.summary, "complete")
 
             self._logger.info(
                 "Agent run completed",
@@ -265,6 +284,7 @@ Base your analysis only on the provided data."""
 
         except Exception as e:
             self._logger.error("Agent run failed", error=str(e))
+            await broadcast_agent_status(self.agent_id, "error", f"Analysis failed: {str(e)[:100]}")
             return AgentResult(success=False, error=str(e))
 
     async def _get_cached_output(self) -> Optional[AgentOutput]:

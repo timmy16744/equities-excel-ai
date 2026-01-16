@@ -109,3 +109,23 @@ async def broadcast_settings_change(category: str, key: str, value: str) -> None
         "key": key,
         "value": value,
     })
+
+
+async def broadcast_agent_thought(agent_id: str, thought: str, phase: str = "thinking") -> None:
+    """Broadcast agent thought/reasoning to all connected clients."""
+    await updates_manager.broadcast({
+        "type": "agent_thought",
+        "agent_id": agent_id,
+        "thought": thought,
+        "phase": phase,
+    })
+
+
+async def broadcast_agent_status(agent_id: str, status: str, message: str = None) -> None:
+    """Broadcast agent status change to all connected clients."""
+    await updates_manager.broadcast({
+        "type": "agent_status",
+        "agent_id": agent_id,
+        "status": status,
+        "message": message or f"{agent_id} agent {status}",
+    })

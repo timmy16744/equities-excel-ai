@@ -107,6 +107,148 @@ class EquitiesExcelApp {
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
+        // Agent Log Panel controls
+        this.setupAgentLogPanel();
+    }
+
+    // Setup Agent Log Panel
+    setupAgentLogPanel() {
+        this.agentLogs = [];
+        this.agentLogFilter = 'all';
+        this.agentLogAutoScroll = true;
+        this.agentLogCount = 0;
+
+        // Toggle panel
+        document.getElementById('agent-log-toggle')?.addEventListener('click', () => {
+            const panel = document.getElementById('agent-log-panel');
+            panel?.classList.toggle('collapsed');
+        });
+
+        // Filter dropdown
+        document.getElementById('agent-log-filter')?.addEventListener('change', (e) => {
+            this.agentLogFilter = e.target.value;
+            this.renderAgentLogs();
+        });
+
+        // Auto-scroll checkbox
+        document.getElementById('agent-log-autoscroll')?.addEventListener('change', (e) => {
+            this.agentLogAutoScroll = e.target.checked;
+        });
+
+        // Clear button
+        document.getElementById('agent-log-clear')?.addEventListener('click', () => {
+            this.agentLogs = [];
+            this.agentLogCount = 0;
+            this.updateAgentLogBadge();
+            this.renderAgentLogs();
+        });
+    }
+
+    // Add entry to agent log
+    addAgentLog(agent, message, type = 'thinking') {
+        const entry = {
+            id: ++this.agentLogCount,
+            agent: agent,
+            message: message,
+            type: type,
+            timestamp: new Date()
+        };
+
+        this.agentLogs.unshift(entry);
+
+        // Limit log size
+        if (this.agentLogs.length > 500) {
+            this.agentLogs.pop();
+        }
+
+        this.updateAgentLogBadge();
+        this.renderAgentLogs();
+
+        // Expand panel if it was collapsed and this is important
+        if (type === 'error' || type === 'complete') {
+            const panel = document.getElementById('agent-log-panel');
+            panel?.classList.remove('collapsed');
+        }
+    }
+
+    // Update badge count
+    updateAgentLogBadge() {
+        const badge = document.getElementById('agent-log-badge');
+        if (badge) {
+            badge.textContent = this.agentLogs.length;
+        }
+    }
+
+    // Render agent logs
+    renderAgentLogs() {
+        const container = document.getElementById('agent-log-entries');
+        if (!container) return;
+
+        const filteredLogs = this.agentLogFilter === 'all'
+            ? this.agentLogs
+            : this.agentLogs.filter(log => log.agent === this.agentLogFilter);
+
+        if (filteredLogs.length === 0) {
+            container.innerHTML = '<div class="agent-log-empty">Waiting for agent activity...</div>';
+            return;
+        }
+
+        container.innerHTML = filteredLogs.slice(0, 100).map(log => `
+            <div class="agent-log-entry ${log.agent}">
+                <div class="agent-log-entry-header">
+                    <span class="agent-log-entry-agent">
+                        ${this.formatAgentName(log.agent)}
+                        <span class="agent-log-entry-type ${log.type}">${log.type}</span>
+                    </span>
+                    <span class="agent-log-entry-time">${this.formatLogTime(log.timestamp)}</span>
+                </div>
+                <div class="agent-log-entry-message">${this.escapeHtml(log.message)}</div>
+            </div>
+        `).join('');
+
+        // Auto-scroll to top (newest)
+        if (this.agentLogAutoScroll) {
+            container.scrollTop = 0;
+        }
+    }
+
+    // Format agent name for display
+    formatAgentName(agent) {
+        const names = {
+            macro: 'Macro Economics',
+            geopolitical: 'Geopolitical',
+            commodities: 'Commodities',
+            sentiment: 'Sentiment',
+            fundamentals: 'Fundamentals',
+            technical: 'Technical',
+            alternative: 'Alternative Data',
+            cross_asset: 'Cross-Asset',
+            event: 'Event-Driven',
+            execution: 'Execution',
+            risk: 'Risk Management',
+            aggregation: 'Aggregation',
+            learning: 'Learning',
+            system: 'System'
+        };
+        return names[agent] || agent;
+    }
+
+    // Format timestamp for log
+    formatLogTime(date) {
+        return date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+    }
+
+    // Escape HTML to prevent XSS
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     // Setup WebSocket connection
@@ -117,6 +259,14 @@ class EquitiesExcelApp {
         // Handle real-time updates
         ws.on('agent_update', (data) => {
             this.handleAgentUpdate(data);
+        });
+
+        ws.on('agent_thought', (data) => {
+            this.handleAgentThought(data);
+        });
+
+        ws.on('agent_status', (data) => {
+            this.handleAgentStatus(data);
         });
 
         ws.on('insight_update', (data) => {
@@ -407,7 +557,7 @@ class EquitiesExcelApp {
 
     // Handle agent update from WebSocket
     handleAgentUpdate(data) {
-        const { agent_id, output } = data;
+        const { agent_id, output, status } = data;
         if (this.spreadsheet.data.agents) {
             this.spreadsheet.data.agents[agent_id] = {
                 ...this.spreadsheet.data.agents[agent_id],
@@ -416,7 +566,44 @@ class EquitiesExcelApp {
             };
             this.spreadsheet.refreshView();
         }
+
+        // Log completion to agent panel
+        const summary = output?.summary || output?.outlook || 'Analysis complete';
+        this.addAgentLog(agent_id, summary, 'complete');
         this.showToast(`${agent_id} agent updated`, 'info');
+    }
+
+    // Handle agent thought/reasoning from WebSocket
+    handleAgentThought(data) {
+        const { agent_id, thought, phase } = data;
+        const type = phase === 'analyzing' ? 'analyzing' : 'thinking';
+        this.addAgentLog(agent_id, thought, type);
+    }
+
+    // Handle agent status change from WebSocket
+    handleAgentStatus(data) {
+        const { agent_id, status, message } = data;
+        let type = 'thinking';
+
+        switch (status) {
+            case 'starting':
+                type = 'thinking';
+                break;
+            case 'analyzing':
+                type = 'analyzing';
+                break;
+            case 'complete':
+                type = 'complete';
+                break;
+            case 'error':
+                type = 'error';
+                break;
+            case 'warning':
+                type = 'warning';
+                break;
+        }
+
+        this.addAgentLog(agent_id, message || `Agent ${status}`, type);
     }
 
     // Handle insight update from WebSocket
