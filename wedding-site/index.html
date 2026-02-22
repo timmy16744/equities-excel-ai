@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Chiara + Tim | 4/4</title>
 
   <!-- Fonts -->
@@ -18,7 +18,7 @@
 
   <style>
     :root {
-      --text: #ffffff;
+      --text: #ffffff; 
       --text-muted: rgba(255, 255, 255, 0.7);
       --bg: #06070e;
     }
@@ -27,7 +27,11 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      cursor: none !important;
+    }
+
+    /* Hide custom cursor native styling on desktop, but allow native on mobile */
+    @media (pointer: fine) {
+      * { cursor: none !important; }
     }
 
     body {
@@ -35,6 +39,8 @@
       color: var(--text);
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
+      width: 100vw;
+      max-width: 100%;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -47,10 +53,10 @@
       width: 100vw;
       height: 100vh;
       z-index: 0;
-      pointer-events: none;
+      pointer-events: none; 
     }
 
-    /* Vignette Scrim to improve text contrast against the bright liquid */
+    /* Vignette Scrim */
     .vignette {
       position: fixed;
       top: 0;
@@ -62,7 +68,7 @@
       pointer-events: none;
     }
 
-    /* Custom Cursor */
+    /* Custom Cursor (Hidden on Touch Devices) */
     .custom-cursor {
       position: fixed;
       width: 40px;
@@ -88,6 +94,10 @@
       border-radius: 50%;
     }
 
+    @media (pointer: coarse), (max-width: 768px) {
+      .custom-cursor { display: none !important; }
+    }
+
     /* Content Wrapper */
     main {
       position: relative;
@@ -98,18 +108,18 @@
     /* Typography Defaults */
     h1, h2, h3, .syne {
       font-family: 'Syne', sans-serif;
-      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4); /* Anchors the text */
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     }
 
     .heading-huge {
-      font-size: clamp(4rem, 12vw, 11rem);
+      font-size: clamp(3rem, 13vw, 11rem);
       font-weight: 800;
       line-height: 0.9;
       letter-spacing: -0.03em;
       text-transform: uppercase;
     }
 
-    /* Frosted Glass Base for legibility */
+    /* Frosted Glass Base */
     .glass-card {
       background: rgba(15, 16, 26, 0.25);
       backdrop-filter: blur(16px);
@@ -182,7 +192,7 @@
 
     .col {
       flex: 1;
-      min-width: 320px;
+      min-width: 300px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -200,7 +210,7 @@
     }
 
     .col h2 {
-      font-size: clamp(2.5rem, 4vw, 4rem);
+      font-size: clamp(2.2rem, 5vw, 4rem);
       font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.02em;
@@ -217,7 +227,7 @@
 
     /* Dress Code */
     .dress-code-section {
-      min-height: 100vh;
+      min-height: 80vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -240,7 +250,7 @@
     }
 
     .dress-code-content h2 {
-      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-size: clamp(2.2rem, 6vw, 5rem);
       font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.02em;
@@ -253,76 +263,43 @@
     }
 
     .footer h1 {
-      font-size: clamp(5rem, 15vw, 15rem);
+      font-size: clamp(4.5rem, 18vw, 15rem);
       line-height: 1;
       margin-top: 1.5rem;
     }
 
+    /* Mobile Optimizations */
     @media (max-width: 768px) {
       .hero {
-        min-height: 100svh;
-        height: auto;
-        padding: 2rem 1.4rem 2.5rem;
-      }
-      nav {
-        font-size: 0.82rem;
-        letter-spacing: 0.1em;
-      }
-      .heading-huge {
-        font-size: clamp(3.6rem, 18vw, 6.2rem);
-        line-height: 0.92;
+        padding: 1.5rem;
       }
       .hero-meta {
         flex-direction: column;
-        gap: 1.1rem;
-        margin-top: 2.4rem;
-        font-size: 0.82rem;
-        letter-spacing: 0.1em;
+        gap: 0.75rem;
+        margin-top: 2rem;
       }
       .details-section {
-        min-height: auto;
-        padding: 6rem 1.3rem;
+        padding: 5rem 1.5rem;
       }
       .details-section .container {
-        gap: 1.6rem;
-      }
-      .col {
-        min-width: 100%;
-      }
-      .col h2 {
-        font-size: clamp(2.2rem, 10vw, 3rem);
-      }
-      .col .time {
-        font-size: 1.05rem;
+        gap: 2rem;
       }
       .glass-card {
-        padding: 2.1rem 1.5rem;
-        border-radius: 22px;
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3);
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+      }
+      .col {
+        align-items: center;
+      }
+      .col .time {
+        font-size: 1rem;
       }
       .dress-code-section {
-        min-height: auto;
-        padding: 4.8rem 1.3rem;
-      }
-      .dress-code-content h2 {
-        font-size: clamp(2.1rem, 9vw, 3.1rem);
+        padding: 2rem 1.5rem;
+        min-height: 60vh;
       }
       .footer {
-        padding: 6.5rem 1.3rem 3rem;
-      }
-      .footer h1 {
-        font-size: clamp(4.6rem, 22vw, 7.5rem);
-      }
-    }
-
-    @media (hover: none), (pointer: coarse) {
-      * {
-        cursor: auto !important;
-      }
-      .custom-cursor {
-        display: none !important;
+        padding: 4rem 1.5rem 3rem;
       }
     }
   </style>
@@ -334,7 +311,7 @@
 
   <!-- WebGL Liquid Gradient Background -->
   <div id="webGLApp"></div>
-
+  
   <!-- Optical Vignette to anchor text -->
   <div class="vignette"></div>
 
@@ -353,7 +330,7 @@
         </h1>
         <div class="hero-meta nav-fade">
           <p>Adelaide Botanic Gardens</p>
-          <p>4:44pm (arrive 4:15pm)</p>
+          <p>4:44 PM (Arrive 4:15)</p>
         </div>
       </div>
     </section>
@@ -361,11 +338,10 @@
     <!-- Details -->
     <section class="details-section">
       <div class="container">
-        <!-- Added glass-card class for ultimate legibility -->
         <div class="col glass-card gs-reveal">
           <p class="label">01. Ceremony</p>
           <h2>Adelaide Botanic <br>Gardens</h2>
-          <p class="time">At 4:44 in the afternoon.<br>Arrive 4:15pm.</p>
+          <p class="time">At 4:44 in the afternoon.<br>(please arrive by 4:15)</p>
         </div>
         <div class="col glass-card gs-reveal">
           <p class="label">02. Reception</p>
@@ -377,7 +353,6 @@
 
     <!-- Dress Code -->
     <section class="dress-code-section">
-      <!-- Added glass-card class for ultimate legibility -->
       <div class="dress-code-content glass-card gs-reveal-up">
         <p class="label">Dress Code</p>
         <h2>We ask all guests to wear neutral colours.</h2>
@@ -386,7 +361,7 @@
 
     <!-- Footer -->
     <footer class="footer gs-reveal">
-      <p class="syne" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted);">Can't wait to celebrate with you</p>
+      <p class="syne" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); font-size: clamp(0.75rem, 3vw, 1rem);">Can't wait to celebrate with you</p>
       <h1 class="heading-huge">04 / 04</h1>
     </footer>
   </main>
@@ -400,7 +375,7 @@
         this.size = 64;
         this.width = this.height = this.size;
         this.maxAge = 64;
-        this.radius = 0.25 * this.size;
+        this.radius = 0.25 * this.size; 
         this.speed = 1 / this.maxAge;
         this.trail = [];
         this.last = null;
@@ -493,24 +468,23 @@
       constructor(sceneManager) {
         this.sceneManager = sceneManager;
         this.mesh = null;
-
+        
         // Deep Purple & Blue Color Palette configuration
         this.uniforms = {
           uTime: { value: 0 },
           uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-
-          // Translated RGB values for Purples and Blues
+          
           uColor1: { value: new THREE.Vector3(0.42, 0.13, 0.66) }, // Rich Purple
           uColor2: { value: new THREE.Vector3(0.12, 0.23, 0.54) }, // Deep Royal Blue
           uColor3: { value: new THREE.Vector3(0.58, 0.20, 0.92) }, // Bright Violet
           uColor4: { value: new THREE.Vector3(0.15, 0.39, 0.92) }, // Ocean Blue
           uColor5: { value: new THREE.Vector3(0.26, 0.22, 0.79) }, // Indigo
           uColor6: { value: new THREE.Vector3(0.49, 0.23, 0.93) }, // Soft Violet
-
-          uSpeed: { value: 0.8 },
+          
+          uSpeed: { value: 0.8 }, 
           uIntensity: { value: 1.4 },
           uTouchTexture: { value: null },
-          uGrainIntensity: { value: 0.05 },
+          uGrainIntensity: { value: 0.05 }, 
           uDarkNavy: { value: new THREE.Vector3(0.06, 0.09, 0.16) }, // Very dark midnight backdrop
           uGradientSize: { value: 0.7 },
           uGradientCount: { value: 8.0 },
@@ -546,35 +520,35 @@
             uniform float uGradientCount;
             uniform float uColor1Weight;
             uniform float uColor2Weight;
-
+            
             varying vec2 vUv;
-
+            
             float grain(vec2 uv, float time) {
               vec2 grainUv = uv * uResolution * 0.5;
               return fract(sin(dot(grainUv + time, vec2(12.9898, 78.233))) * 43758.5453) * 2.0 - 1.0;
             }
-
+            
             vec3 getGradientColor(vec2 uv, float time) {
               float gradientRadius = uGradientSize;
-
+              
               vec2 center1 = vec2(0.5 + sin(time * uSpeed * 0.4) * 0.4, 0.5 + cos(time * uSpeed * 0.5) * 0.4);
               vec2 center2 = vec2(0.5 + cos(time * uSpeed * 0.6) * 0.5, 0.5 + sin(time * uSpeed * 0.45) * 0.5);
               vec2 center3 = vec2(0.5 + sin(time * uSpeed * 0.35) * 0.45, 0.5 + cos(time * uSpeed * 0.55) * 0.45);
               vec2 center4 = vec2(0.5 + cos(time * uSpeed * 0.5) * 0.4, 0.5 + sin(time * uSpeed * 0.4) * 0.4);
               vec2 center5 = vec2(0.5 + sin(time * uSpeed * 0.7) * 0.35, 0.5 + cos(time * uSpeed * 0.6) * 0.35);
               vec2 center6 = vec2(0.5 + cos(time * uSpeed * 0.45) * 0.5, 0.5 + sin(time * uSpeed * 0.65) * 0.5);
-
+              
               float dist1 = length(uv - center1); float dist2 = length(uv - center2);
               float dist3 = length(uv - center3); float dist4 = length(uv - center4);
               float dist5 = length(uv - center5); float dist6 = length(uv - center6);
-
+              
               float influence1 = 1.0 - smoothstep(0.0, gradientRadius, dist1);
               float influence2 = 1.0 - smoothstep(0.0, gradientRadius, dist2);
               float influence3 = 1.0 - smoothstep(0.0, gradientRadius, dist3);
               float influence4 = 1.0 - smoothstep(0.0, gradientRadius, dist4);
               float influence5 = 1.0 - smoothstep(0.0, gradientRadius, dist5);
               float influence6 = 1.0 - smoothstep(0.0, gradientRadius, dist6);
-
+              
               vec3 color = vec3(0.0);
               color += uColor1 * influence1 * (0.55 + 0.45 * sin(time * uSpeed)) * uColor1Weight;
               color += uColor2 * influence2 * (0.55 + 0.45 * cos(time * uSpeed * 1.2)) * uColor2Weight;
@@ -582,34 +556,34 @@
               color += uColor4 * influence4 * (0.55 + 0.45 * cos(time * uSpeed * 1.3)) * uColor2Weight;
               color += uColor5 * influence5 * (0.55 + 0.45 * sin(time * uSpeed * 1.1)) * uColor1Weight;
               color += uColor6 * influence6 * (0.55 + 0.45 * cos(time * uSpeed * 0.9)) * uColor2Weight;
-
+              
               color = clamp(color, vec3(0.0), vec3(1.0)) * uIntensity;
               float brightness = length(color);
               float mixFactor = max(brightness, 0.3);
               color = mix(uDarkNavy, color, mixFactor);
-
+              
               return color;
             }
-
+            
             void main() {
               vec2 uv = vUv;
-
+              
               // Touch Distortion
               vec4 touchTex = texture2D(uTouchTexture, uv);
               float vx = -(touchTex.r * 2.0 - 1.0);
               float vy = -(touchTex.g * 2.0 - 1.0);
               float intensity = touchTex.b;
-
-              uv.x += vx * 0.4 * intensity;
+              
+              uv.x += vx * 0.4 * intensity; 
               uv.y += vy * 0.4 * intensity;
-
+              
               float dist = length(uv - 0.5);
               float ripple = sin(dist * 20.0 - uTime * 2.0) * 0.02 * intensity;
               uv += vec2(ripple);
-
+              
               vec3 color = getGradientColor(uv, uTime);
               color += grain(uv, uTime) * uGrainIntensity;
-
+              
               gl_FragColor = vec4(color, 1.0);
             }
           `
@@ -633,32 +607,27 @@
       }
     }
 
-    const IS_TOUCH_DEVICE = window.matchMedia("(hover: none), (pointer: coarse)").matches;
-    const IS_SMALL_SCREEN = window.matchMedia("(max-width: 768px)").matches;
-    const IS_MOBILE = IS_TOUCH_DEVICE || IS_SMALL_SCREEN;
-
     class App {
       constructor() {
         this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_MOBILE ? 1.25 : 2));
+        
+        // MOBILE OPTIMIZATION: Limit pixel ratio to 1 on small devices to save battery/performance
+        const pixelRatio = window.innerWidth < 768 ? 1 : Math.min(window.devicePixelRatio, 2);
+        this.renderer.setPixelRatio(pixelRatio);
+        
         document.getElementById("webGLApp").appendChild(this.renderer.domElement);
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.z = 50;
-
+        
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x06070e);
-
+        this.scene.background = new THREE.Color(0x06070e); 
+        
         this.clock = new THREE.Clock();
         this.touchTexture = new TouchTexture();
         this.gradientBackground = new GradientBackground(this);
         this.gradientBackground.uniforms.uTouchTexture.value = this.touchTexture.texture;
-        if (IS_MOBILE) {
-          this.gradientBackground.uniforms.uIntensity.value = 1.15;
-          this.gradientBackground.uniforms.uGrainIntensity.value = 0.02;
-          this.gradientBackground.uniforms.uSpeed.value = 0.62;
-        }
 
         this.init();
       }
@@ -666,14 +635,13 @@
       init() {
         this.gradientBackground.init();
         this.tick();
-
+        
         window.addEventListener("resize", () => this.onResize());
         window.addEventListener("mousemove", (ev) => this.onMouseMove(ev));
         window.addEventListener("touchmove", (ev) => this.onTouchMove(ev), { passive: true });
       }
 
       onTouchMove(ev) {
-        if (!ev.touches || !ev.touches[0]) return;
         const touch = ev.touches[0];
         this.onMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
       }
@@ -704,7 +672,11 @@
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_MOBILE ? 1.25 : 2));
+        
+        // Re-evaluate pixel ratio on resize/orientation change
+        const pixelRatio = window.innerWidth < 768 ? 1 : Math.min(window.devicePixelRatio, 2);
+        this.renderer.setPixelRatio(pixelRatio);
+        
         this.gradientBackground.onResize(window.innerWidth, window.innerHeight);
       }
     }
@@ -712,10 +684,12 @@
 
 
     // ==========================================
-    // 2. CUSTOM CURSOR
+    // 2. CUSTOM CURSOR (Disabled on Touch)
     // ==========================================
-    const cursor = document.getElementById("customCursor");
-    if (!IS_TOUCH_DEVICE) {
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    
+    if (!isTouchDevice) {
+      const cursor = document.getElementById("customCursor");
       let mouseX = window.innerWidth / 2;
       let mouseY = window.innerHeight / 2;
 
@@ -748,24 +722,24 @@
     // ==========================================
     gsap.registerPlugin(ScrollTrigger);
 
-    let lenis = null;
-    if (!IS_TOUCH_DEVICE) {
-      lenis = new Lenis({
-        duration: 1.05,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        direction: "vertical",
-        gestureDirection: "vertical",
-        smooth: true,
-      });
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      direction: 'vertical',
+      gestureDirection: 'vertical',
+      smooth: true,
+      smoothTouch: false, // Ensures native smooth touch scrolling on mobile
+    });
 
-      lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add((time) => {
-        lenis.raf(time * 1000);
-      });
-      gsap.ticker.lagSmoothing(0, 0);
-    } else {
-      window.addEventListener("scroll", () => ScrollTrigger.update(), { passive: true });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
     }
+    requestAnimationFrame(raf);
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time)=>{ lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0, 0);
 
     // Initial Hero Animation
     const tlLoader = gsap.timeline();
@@ -790,11 +764,11 @@
       gsap.from(elem, {
         scrollTrigger: {
           trigger: elem,
-          start: IS_MOBILE ? "top 92%" : "top 85%",
+          start: "top 85%",
         },
-        y: IS_MOBILE ? 36 : 60,
+        y: 60,
         opacity: 0,
-        duration: IS_MOBILE ? 0.9 : 1.2,
+        duration: 1.2,
         ease: "power3.out"
       });
     });
@@ -803,12 +777,12 @@
       gsap.from(elem, {
         scrollTrigger: {
           trigger: elem,
-          start: IS_MOBILE ? "top 90%" : "top 80%",
+          start: "top 80%",
         },
-        scale: IS_MOBILE ? 0.98 : 0.95,
-        y: IS_MOBILE ? 44 : 80,
+        scale: 0.95,
+        y: 80,
         opacity: 0,
-        duration: IS_MOBILE ? 1.0 : 1.5,
+        duration: 1.5,
         ease: "expo.out"
       });
     });
