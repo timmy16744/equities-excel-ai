@@ -259,12 +259,70 @@
     }
 
     @media (max-width: 768px) {
+      .hero {
+        min-height: 100svh;
+        height: auto;
+        padding: 1.5rem 1.1rem 2rem;
+      }
+      nav {
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+      }
+      .heading-huge {
+        font-size: clamp(3.1rem, 18vw, 5.4rem);
+        line-height: 0.92;
+      }
       .hero-meta {
         flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        font-size: 0.73rem;
+        letter-spacing: 0.07em;
+      }
+      .details-section {
+        min-height: auto;
+        padding: 4.25rem 1.1rem;
+      }
+      .details-section .container {
         gap: 1rem;
       }
+      .col {
+        min-width: 100%;
+      }
+      .col h2 {
+        font-size: clamp(2rem, 10vw, 2.5rem);
+      }
+      .col .time {
+        font-size: 1rem;
+      }
       .glass-card {
-        padding: 2.5rem 1.5rem;
+        padding: 1.6rem 1.2rem;
+        border-radius: 18px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      }
+      .dress-code-section {
+        min-height: auto;
+        padding: 3.5rem 1.1rem;
+      }
+      .dress-code-content h2 {
+        font-size: clamp(1.8rem, 9vw, 2.5rem);
+      }
+      .footer {
+        padding: 4.5rem 1.1rem 2.5rem;
+      }
+      .footer h1 {
+        font-size: clamp(3.7rem, 26vw, 6rem);
+      }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      * {
+        cursor: auto !important;
+      }
+      .custom-cursor {
+        display: none !important;
       }
     }
   </style>
@@ -575,11 +633,15 @@
       }
     }
 
+    const IS_TOUCH_DEVICE = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    const IS_SMALL_SCREEN = window.matchMedia("(max-width: 768px)").matches;
+    const IS_MOBILE = IS_TOUCH_DEVICE || IS_SMALL_SCREEN;
+
     class App {
       constructor() {
         this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_MOBILE ? 1.25 : 2));
         document.getElementById("webGLApp").appendChild(this.renderer.domElement);
 
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -592,6 +654,11 @@
         this.touchTexture = new TouchTexture();
         this.gradientBackground = new GradientBackground(this);
         this.gradientBackground.uniforms.uTouchTexture.value = this.touchTexture.texture;
+        if (IS_MOBILE) {
+          this.gradientBackground.uniforms.uIntensity.value = 1.15;
+          this.gradientBackground.uniforms.uGrainIntensity.value = 0.02;
+          this.gradientBackground.uniforms.uSpeed.value = 0.62;
+        }
 
         this.init();
       }
@@ -602,10 +669,11 @@
 
         window.addEventListener("resize", () => this.onResize());
         window.addEventListener("mousemove", (ev) => this.onMouseMove(ev));
-        window.addEventListener("touchmove", (ev) => this.onTouchMove(ev));
+        window.addEventListener("touchmove", (ev) => this.onTouchMove(ev), { passive: true });
       }
 
       onTouchMove(ev) {
+        if (!ev.touches || !ev.touches[0]) return;
         const touch = ev.touches[0];
         this.onMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
       }
@@ -636,6 +704,7 @@
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_MOBILE ? 1.25 : 2));
         this.gradientBackground.onResize(window.innerWidth, window.innerHeight);
       }
     }
@@ -646,30 +715,32 @@
     // 2. CUSTOM CURSOR
     // ==========================================
     const cursor = document.getElementById("customCursor");
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
+    if (!IS_TOUCH_DEVICE) {
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
 
-    document.addEventListener("mousemove", (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursor.style.left = mouseX + "px";
-      cursor.style.top = mouseY + "px";
-    });
+      document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursor.style.left = mouseX + "px";
+        cursor.style.top = mouseY + "px";
+      });
 
-    document.querySelectorAll("a, button").forEach(el => {
-      el.addEventListener("mouseenter", () => {
-        cursor.style.width = "60px";
-        cursor.style.height = "60px";
-        cursor.style.borderColor = "rgba(255, 255, 255, 0.1)";
-        cursor.style.background = "rgba(255, 255, 255, 0.1)";
+      document.querySelectorAll("a, button").forEach(el => {
+        el.addEventListener("mouseenter", () => {
+          cursor.style.width = "60px";
+          cursor.style.height = "60px";
+          cursor.style.borderColor = "rgba(255, 255, 255, 0.1)";
+          cursor.style.background = "rgba(255, 255, 255, 0.1)";
+        });
+        el.addEventListener("mouseleave", () => {
+          cursor.style.width = "40px";
+          cursor.style.height = "40px";
+          cursor.style.borderColor = "var(--text-muted)";
+          cursor.style.background = "transparent";
+        });
       });
-      el.addEventListener("mouseleave", () => {
-        cursor.style.width = "40px";
-        cursor.style.height = "40px";
-        cursor.style.borderColor = "var(--text-muted)";
-        cursor.style.background = "transparent";
-      });
-    });
+    }
 
 
     // ==========================================
@@ -677,23 +748,24 @@
     // ==========================================
     gsap.registerPlugin(ScrollTrigger);
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-    });
+    let lenis = null;
+    if (!IS_TOUCH_DEVICE) {
+      lenis = new Lenis({
+        duration: 1.05,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        direction: "vertical",
+        gestureDirection: "vertical",
+        smooth: true,
+      });
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0, 0);
+    } else {
+      window.addEventListener("scroll", () => ScrollTrigger.update(), { passive: true });
     }
-    requestAnimationFrame(raf);
-
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time)=>{ lenis.raf(time * 1000); });
-    gsap.ticker.lagSmoothing(0, 0);
 
     // Initial Hero Animation
     const tlLoader = gsap.timeline();
@@ -718,11 +790,11 @@
       gsap.from(elem, {
         scrollTrigger: {
           trigger: elem,
-          start: "top 85%",
+          start: IS_MOBILE ? "top 92%" : "top 85%",
         },
-        y: 60,
+        y: IS_MOBILE ? 36 : 60,
         opacity: 0,
-        duration: 1.2,
+        duration: IS_MOBILE ? 0.9 : 1.2,
         ease: "power3.out"
       });
     });
@@ -731,12 +803,12 @@
       gsap.from(elem, {
         scrollTrigger: {
           trigger: elem,
-          start: "top 80%",
+          start: IS_MOBILE ? "top 90%" : "top 80%",
         },
-        scale: 0.95,
-        y: 80,
+        scale: IS_MOBILE ? 0.98 : 0.95,
+        y: IS_MOBILE ? 44 : 80,
         opacity: 0,
-        duration: 1.5,
+        duration: IS_MOBILE ? 1.0 : 1.5,
         ease: "expo.out"
       });
     });
