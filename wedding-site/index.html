@@ -386,6 +386,15 @@
       margin-top: 1.5rem;
     }
 
+    .countdown-minimal {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
     /* Mobile Optimizations */
     @media (max-width: 768px) {
       .hero {
@@ -485,6 +494,7 @@
     <footer class="footer gs-reveal">
       <p class="syne" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-muted); font-size: clamp(0.75rem, 3vw, 1rem);">Can't wait to celebrate with you</p>
       <h1 class="heading-huge">04 / 04</h1>
+      <p class="countdown-minimal" id="countdownMinimal">Loading countdown...</p>
     </footer>
   </main>
 
@@ -982,6 +992,25 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && rsvpModal.classList.contains("open")) closeRsvpModal();
     });
+
+    // Minimal countdown (to April 4, 2026)
+    const countdownEl = document.getElementById("countdownMinimal");
+    const weddingDate = new Date("2026-04-04T16:44:00");
+    function updateCountdown() {
+      const now = new Date();
+      const ms = weddingDate - now;
+      if (ms <= 0) {
+        countdownEl.textContent = "Today";
+        return;
+      }
+      const totalSeconds = Math.floor(ms / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      countdownEl.textContent = `${days}d ${hours}h ${mins}m`;
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
   </script>
 </body>
