@@ -173,6 +173,124 @@
       text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
+    .rsvp-btn {
+      margin-top: 2rem;
+      padding: 0.85rem 1.4rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .rsvp-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .rsvp-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .rsvp-modal.open {
+      display: flex;
+    }
+    .rsvp-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 8, 14, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .rsvp-modal__panel {
+      position: relative;
+      z-index: 1;
+      width: min(560px, 94vw);
+      padding: 1.4rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 15, 25, 0.7);
+      box-shadow: 0 24px 44px rgba(0, 0, 0, 0.4);
+    }
+    .rsvp-modal__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.9rem;
+      gap: 1rem;
+    }
+    .rsvp-modal__top h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .rsvp-close {
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 999px;
+      width: 34px;
+      height: 34px;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .rsvp-form {
+      display: grid;
+      gap: 0.7rem;
+    }
+    .rsvp-form label {
+      display: grid;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .rsvp-form input,
+    .rsvp-form textarea {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      font: inherit;
+      outline: none;
+    }
+    .rsvp-form input:focus,
+    .rsvp-form textarea:focus {
+      border-color: rgba(255, 255, 255, 0.55);
+    }
+    .rsvp-form textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+    .rsvp-submit {
+      margin-top: 0.35rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.78rem 1.1rem;
+    }
+
     /* Details Section */
     .details-section {
       padding: 10rem 2rem;
@@ -278,6 +396,9 @@
         gap: 0.75rem;
         margin-top: 2rem;
       }
+      .rsvp-btn {
+        margin-top: 1.4rem;
+      }
       .details-section {
         padding: 5rem 1.5rem;
       }
@@ -332,6 +453,7 @@
           <p>Adelaide Botanic Gardens</p>
           <p>4:44 PM (Arrive 4:15)</p>
         </div>
+        <button type="button" class="rsvp-btn nav-fade" id="openRsvpBtn">RSVP</button>
       </div>
     </section>
 
@@ -365,6 +487,34 @@
       <h1 class="heading-huge">04 / 04</h1>
     </footer>
   </main>
+
+  <div class="rsvp-modal" id="rsvpModal" aria-hidden="true">
+    <div class="rsvp-modal__backdrop" id="rsvpBackdrop"></div>
+    <div class="rsvp-modal__panel glass-card" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
+      <div class="rsvp-modal__top">
+        <h3 id="rsvpTitle">RSVP</h3>
+        <button type="button" class="rsvp-close" id="closeRsvpBtn" aria-label="Close RSVP form">X</button>
+      </div>
+      <form class="rsvp-form" action="https://formsubmit.co/chiaramarinoo@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="Wedding RSVP - Chiara + Tim">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <label>
+          Name
+          <input type="text" name="Name" required>
+        </label>
+        <label>
+          Guest(s) Name
+          <input type="text" name="Guests Name">
+        </label>
+        <label>
+          Dietary
+          <textarea name="Dietary"></textarea>
+        </label>
+        <button type="submit" class="rsvp-submit">Send RSVP</button>
+      </form>
+    </div>
+  </div>
 
   <script>
     // ==========================================
@@ -807,6 +957,31 @@
     .to(bgUniforms.uIntensity, { value: 1.28, ease: "none" }, 0)
     .to(bgUniforms.uGrainIntensity, { value: 0.035, ease: "none" }, 0)
     .to(bgUniforms.uSpeed, { value: 0.68, ease: "none" }, 0);
+
+    // RSVP modal controls
+    const rsvpModal = document.getElementById("rsvpModal");
+    const openRsvpBtn = document.getElementById("openRsvpBtn");
+    const closeRsvpBtn = document.getElementById("closeRsvpBtn");
+    const rsvpBackdrop = document.getElementById("rsvpBackdrop");
+
+    function openRsvpModal() {
+      rsvpModal.classList.add("open");
+      rsvpModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeRsvpModal() {
+      rsvpModal.classList.remove("open");
+      rsvpModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    openRsvpBtn.addEventListener("click", openRsvpModal);
+    closeRsvpBtn.addEventListener("click", closeRsvpModal);
+    rsvpBackdrop.addEventListener("click", closeRsvpModal);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && rsvpModal.classList.contains("open")) closeRsvpModal();
+    });
 
   </script>
 </body>
