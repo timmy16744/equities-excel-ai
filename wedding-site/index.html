@@ -342,6 +342,75 @@
       color: var(--text-muted);
       line-height: 1.5;
     }
+    .details-btn {
+      margin-top: 1.2rem;
+      align-self: flex-start;
+      padding: 0.72rem 1.15rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .details-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .info-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1250;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .info-modal.open {
+      display: flex;
+    }
+    .info-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 8, 14, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .info-modal__panel {
+      position: relative;
+      z-index: 1;
+      width: min(460px, 92vw);
+      padding: 1.4rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 15, 25, 0.7);
+      box-shadow: 0 24px 44px rgba(0, 0, 0, 0.4);
+    }
+    .info-modal__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      gap: 1rem;
+    }
+    .info-modal__top h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .info-copy {
+      color: var(--text-muted);
+      line-height: 1.5;
+      font-size: 1rem;
+    }
 
     /* Dress Code */
     .dress-code-section {
@@ -424,6 +493,9 @@
       .col .time {
         font-size: 1rem;
       }
+      .details-btn {
+        align-self: center;
+      }
       .dress-code-section {
         padding: 2rem 1.5rem;
         min-height: 60vh;
@@ -473,11 +545,13 @@
           <p class="label">01. Ceremony</p>
           <h2>Adelaide Botanic <br>Gardens</h2>
           <p class="time">Economic Garden<br>At 4:30 in the afternoon.<br>(please arrive by 4:15)</p>
+          <button type="button" class="details-btn" data-info-title="Map" data-info-message="Map to the Economic Garden.">Map</button>
         </div>
         <div class="col glass-card gs-reveal">
           <p class="label">02. Reception</p>
           <h2>Paper Tiger</h2>
           <p class="time">Dinner, drinks & celebrations<br>to follow the ceremony.</p>
+          <button type="button" class="details-btn" data-info-title="Seating Map" data-info-message="Paper Tiger seating map.">Seating Map</button>
         </div>
       </div>
     </section>
@@ -523,6 +597,17 @@
         </label>
         <button type="submit" class="rsvp-submit">Send RSVP</button>
       </form>
+    </div>
+  </div>
+
+  <div class="info-modal" id="infoModal" aria-hidden="true">
+    <div class="info-modal__backdrop" id="infoBackdrop"></div>
+    <div class="info-modal__panel glass-card" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+      <div class="info-modal__top">
+        <h3 id="infoTitle">Coming soon</h3>
+        <button type="button" class="rsvp-close" id="closeInfoBtn" aria-label="Close info popup">X</button>
+      </div>
+      <p class="info-copy" id="infoText">This is coming soon.</p>
     </div>
   </div>
 
@@ -973,24 +1058,57 @@
     const openRsvpBtn = document.getElementById("openRsvpBtn");
     const closeRsvpBtn = document.getElementById("closeRsvpBtn");
     const rsvpBackdrop = document.getElementById("rsvpBackdrop");
+    const infoModal = document.getElementById("infoModal");
+    const infoBackdrop = document.getElementById("infoBackdrop");
+    const closeInfoBtn = document.getElementById("closeInfoBtn");
+    const infoTitle = document.getElementById("infoTitle");
+    const infoText = document.getElementById("infoText");
+    const detailsInfoButtons = document.querySelectorAll(".details-btn");
+
+    function syncBodyScrollLock() {
+      const anyOpen = rsvpModal.classList.contains("open") || infoModal.classList.contains("open");
+      document.body.style.overflow = anyOpen ? "hidden" : "";
+    }
 
     function openRsvpModal() {
       rsvpModal.classList.add("open");
       rsvpModal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
+      syncBodyScrollLock();
     }
 
     function closeRsvpModal() {
       rsvpModal.classList.remove("open");
       rsvpModal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
+      syncBodyScrollLock();
+    }
+
+    function openInfoModal(title, message) {
+      infoTitle.textContent = title;
+      infoText.textContent = `${message} Coming soon.`;
+      infoModal.classList.add("open");
+      infoModal.setAttribute("aria-hidden", "false");
+      syncBodyScrollLock();
+    }
+
+    function closeInfoModal() {
+      infoModal.classList.remove("open");
+      infoModal.setAttribute("aria-hidden", "true");
+      syncBodyScrollLock();
     }
 
     openRsvpBtn.addEventListener("click", openRsvpModal);
     closeRsvpBtn.addEventListener("click", closeRsvpModal);
     rsvpBackdrop.addEventListener("click", closeRsvpModal);
+    detailsInfoButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        openInfoModal(btn.dataset.infoTitle || "Coming soon", btn.dataset.infoMessage || "Details");
+      });
+    });
+    closeInfoBtn.addEventListener("click", closeInfoModal);
+    infoBackdrop.addEventListener("click", closeInfoModal);
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && rsvpModal.classList.contains("open")) closeRsvpModal();
+      if (e.key === "Escape" && infoModal.classList.contains("open")) closeInfoModal();
     });
 
     // Minimal countdown (to April 4, 2026)
