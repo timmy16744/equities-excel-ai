@@ -388,6 +388,8 @@
       position: relative;
       z-index: 1;
       width: min(460px, 92vw);
+      max-height: 92vh;
+      overflow: auto;
       padding: 1.4rem;
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -410,6 +412,139 @@
       color: var(--text-muted);
       line-height: 1.5;
       font-size: 1rem;
+    }
+    .map-preview {
+      margin-top: 0.75rem;
+      border-radius: 16px;
+      padding: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .map-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      aspect-ratio: 2 / 3;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .map-grid {
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 1;
+    }
+    .map-base {
+      stroke: #ffffff;
+      stroke-width: 6;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .map-route {
+      stroke-width: 12;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .route-line {
+      stroke-dasharray: 1 1;
+      stroke-dashoffset: 1;
+      opacity: 0.95;
+    }
+    .map-preview.play .route-line {
+      animation: routeDraw 2.4s ease forwards;
+    }
+    .map-preview.play .route-line.route-b {
+      animation-delay: 0.35s;
+    }
+    .map-preview.play .route-line.route-c {
+      animation-delay: 0.65s;
+    }
+    .route-line.route-a {
+      stroke: #60a5fa;
+    }
+    .route-line.route-b {
+      stroke: #a78bfa;
+    }
+    .route-line.route-c {
+      stroke: #34d399;
+    }
+    .map-pin {
+      transform-origin: center;
+      transform-box: fill-box;
+    }
+    .map-preview.play .map-pin {
+      animation: pinPulse 2.2s ease-in-out infinite;
+    }
+    .map-label {
+      font-family: 'Inter', sans-serif;
+      fill: #f8fafc;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .map-label-sub {
+      font-family: 'Inter', sans-serif;
+      fill: rgba(191, 219, 254, 0.95);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .map-note {
+      margin-top: 0.55rem;
+      font-size: 0.86rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .info-modal.map-mode .info-modal__panel {
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    .info-modal.map-mode .info-modal__top {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      margin: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .info-modal.map-mode .info-modal__top h3 {
+      display: none;
+    }
+    .info-modal.map-mode .info-modal__top .rsvp-close {
+      pointer-events: auto;
+      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(15, 18, 30, 0.66);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .info-modal.map-mode .info-copy {
+      display: none;
+    }
+    .info-modal.map-mode .map-preview {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .info-modal.map-mode .map-svg {
+      width: auto;
+      max-width: 96vw;
+      height: 92vh;
+      max-height: 92vh;
+      border-radius: 0;
+    }
+    @keyframes routeDraw {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes pinPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.11); opacity: 0.8; }
     }
 
     /* Dress Code */
@@ -545,13 +680,13 @@
           <p class="label">01. Ceremony</p>
           <h2>Adelaide Botanic <br>Gardens</h2>
           <p class="time">Economic Garden<br>At 4:30 in the afternoon.<br>(please arrive by 4:15)</p>
-          <button type="button" class="details-btn" data-info-title="Map" data-info-message="Map to the Economic Garden.">Map</button>
+          <button type="button" class="details-btn" data-info-type="map" data-info-title="Botanic Gardens Map" data-info-message="Map preview to the Economic Garden.">Map</button>
         </div>
         <div class="col glass-card gs-reveal">
           <p class="label">02. Reception</p>
           <h2>Paper Tiger</h2>
           <p class="time">Dinner, drinks & celebrations<br>to follow the ceremony.</p>
-          <button type="button" class="details-btn" data-info-title="Seating Map" data-info-message="Paper Tiger seating map.">Seating Map</button>
+          <button type="button" class="details-btn" data-info-type="text" data-info-title="Seating Map" data-info-message="Paper Tiger seating map.">Seating Map</button>
         </div>
       </div>
     </section>
@@ -608,6 +743,58 @@
         <button type="button" class="rsvp-close" id="closeInfoBtn" aria-label="Close info popup">X</button>
       </div>
       <p class="info-copy" id="infoText">This is coming soon.</p>
+      <div class="map-preview" id="mapPreview" hidden>
+        <svg viewBox="330 40 560 840" class="map-svg" aria-label="Map preview">
+          <defs>
+            <filter id="pinGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#3b82f6" flood-opacity="0.45"></feDropShadow>
+            </filter>
+          </defs>
+          <g>
+            <g class="map-base">
+              <path d="M 694 87.5 L 659 320.5 L 687 319.5 L 710 323.5 L 723 334.5 L 733 352.5 L 738 387.5 L 795 384.5 L 829 382.5 L 868 385.5"></path>
+              <path d="M 589 738.5 L 596 702.5 L 615 708.5 L 629 702.5 L 651 687.5 L 677 678.5 L 708 677.5 L 752 680.5 L 769 680.5 L 782 671.5 L 794 649.5 L 804 618.5 L 841 623.5 L 851 624.5 L 823 585.5 L 809 553.5 L 789 527.5 L 754 499.5 L 731 473.5 L 723 449.5 L 709 417.5 L 693 395.5 L 697 375.5 L 693 390.5 L 739 387.5"></path>
+              <path d="M 609 632.5 L 622 638.5 L 636 630.5 L 656 604.5 L 679 576.5 L 697 560.5 L 714 551.5 L 731 555.5 L 748 573.5 L 768 593.5 L 788 611.5 L 802 618.5 L 874 629.5 L 850 625.5 L 857 654.5 L 850 686.5 L 840 703.5 L 827 728.5 L 849 725.5 L 870 722.5"></path>
+              <path d="M 478 141.5 L 480 179.5 L 476 205.5 L 452 315.5 L 592 310.5 L 597 322.5 L 583 327.5 L 564 330.5 L 549 338.5 L 538 365.5 L 537 390.5 L 545 399.5 L 568 399.5 L 582 395.5 L 595 406.5 L 604 418.5 L 619 423.5 L 632 419.5 L 651 424.5 L 672 438.5 L 689 447.5 L 700 466.5 L 722 451.5 L 700 467.5 L 685 482.5 L 670 494.5 L 646 499.5 L 631 500.5 L 597 493.5 L 582 481.5 L 555 460.5 L 535 440.5 L 523 415.5 L 509 393.5 L 489 373.5 L 465 362.5 L 449 352.5 L 445 341.5 L 452 315.5"></path>
+              <path d="M 597 700.5 L 629 500.5"></path>
+              <path d="M 677 203.5 L 698 197.5 L 719 194.5 L 739 192.5 L 747 206.5 L 739 235.5 L 735 305.5 L 743 308.5 L 712 321.5 L 751 304.5 L 770 307.5 L 791 300.5 L 792 298.5 L 874 297.5 L 792 298.5 L 795 255.5 L 800 226.5 L 799 202.5 L 788 197.5 L 768 198.5 L 750 207.5 L 749 207.5"></path>
+              <path d="M 482 157.5 L 507 148.5 L 530 145.5 L 556 145.5 L 577 157.5 L 595 171.5 L 611 181.5 L 626 191.5 L 651 190.5 L 679 183.5"></path>
+              <path d="M 477 182.5 L 608 179.5"></path>
+              <path d="M 542 179.5 C 541.86,179.36 539.5,199 536,202.5 C 532.5,206 521.62,202.96 517,204.5 C 512.38,206.04 506.08,210.42 503,213.5 C 499.92,216.58 496.12,222.58 495,226.5 C 493.88,230.42 494.86,237.02 495,241.5 C 495.14,245.98 493.9,254.3 496,258.5 C 498.1,262.7 505.1,269.54 510,271.5 C 514.9,273.46 524.98,274.04 531,272.5 C 537.02,270.96 548.24,264.98 553,260.5 C 557.76,256.02 562.76,245.54 565,240.5 C 567.24,235.46 570.26,229.12 569,224.5 C 567.74,219.88 560.48,210.44 556,207.5 C 551.52,204.56 538.96,207.42 537,203.5"></path>
+              <path d="M 593 232.5 L 400 232.5"></path>
+              <path d="M 536 201.5 L 512 310.5"></path>
+            </g>
+            <g class="map-route">
+              <path class="route-line route-a" pathLength="1" d="M 585 752.5 L 630 498.5 L 604 495.5 L 584 485.5 L 570 472.5 L 550 456.5 L 535 438.5 L 525 418.5 L 514 396.5 L 490 373.5 L 464 364.5 L 444 350.5 L 446 333.5 L 452 312.5 L 515 314.5 L 518 272.5"></path>
+              <path class="route-line route-b" pathLength="1" d="M 694 70.5 L 679 186.5 L 641 192.5 L 609 180.5 L 585 178.5 L 539 180.5 L 536 205.5"></path>
+              <path class="route-line route-c" pathLength="1" d="M 388 232.5 L 494 234.5"></path>
+            </g>
+            <circle class="map-pin" cx="531" cy="238" r="35" fill="#3b82f6" filter="url(#pinGlow)"></circle>
+            <circle class="map-pin" cx="531" cy="238" r="13" fill="#ffffff"></circle>
+            <g transform="translate(586 196)">
+              <rect width="230" height="88" rx="14" fill="rgba(15,23,42,0.78)" stroke="rgba(255,255,255,0.2)"></rect>
+              <text class="map-label" x="16" y="36">The Fountain</text>
+              <text class="map-label-sub" x="16" y="62">Wedding Venue</text>
+            </g>
+            <g transform="translate(448 788)">
+              <rect width="244" height="88" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.2)"></rect>
+              <text class="map-label" x="16" y="36">Main Gate</text>
+              <text class="map-label-sub" x="16" y="62">North Terrace</text>
+            </g>
+            <g transform="translate(664 46)">
+              <rect width="206" height="76" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.2)"></rect>
+              <text class="map-label" x="16" y="33">Friend's Gate</text>
+              <text class="map-label-sub" x="16" y="58">Arrivals</text>
+            </g>
+            <g transform="translate(340 284)">
+              <rect width="194" height="76" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.2)"></rect>
+              <text class="map-label" x="16" y="33">Ginkgo Gate</text>
+              <text class="map-label-sub" x="16" y="58">Arrivals</text>
+            </g>
+          </g>
+        </svg>
+        <p class="info-copy map-note">Interactive routing and turn-by-turn details coming soon.</p>
+      </div>
     </div>
   </div>
 
@@ -1063,6 +1250,7 @@
     const closeInfoBtn = document.getElementById("closeInfoBtn");
     const infoTitle = document.getElementById("infoTitle");
     const infoText = document.getElementById("infoText");
+    const mapPreview = document.getElementById("mapPreview");
     const detailsInfoButtons = document.querySelectorAll(".details-btn");
 
     function syncBodyScrollLock() {
@@ -1082,9 +1270,20 @@
       syncBodyScrollLock();
     }
 
-    function openInfoModal(title, message) {
+    function openInfoModal(title, message, type = "text") {
       infoTitle.textContent = title;
       infoText.textContent = `${message} Coming soon.`;
+      if (type === "map") {
+        infoModal.classList.add("map-mode");
+        mapPreview.hidden = false;
+        mapPreview.classList.remove("play");
+        void mapPreview.offsetWidth;
+        mapPreview.classList.add("play");
+      } else {
+        infoModal.classList.remove("map-mode");
+        mapPreview.classList.remove("play");
+        mapPreview.hidden = true;
+      }
       infoModal.classList.add("open");
       infoModal.setAttribute("aria-hidden", "false");
       syncBodyScrollLock();
@@ -1092,7 +1291,10 @@
 
     function closeInfoModal() {
       infoModal.classList.remove("open");
+      infoModal.classList.remove("map-mode");
       infoModal.setAttribute("aria-hidden", "true");
+      mapPreview.classList.remove("play");
+      mapPreview.hidden = true;
       syncBodyScrollLock();
     }
 
@@ -1101,7 +1303,11 @@
     rsvpBackdrop.addEventListener("click", closeRsvpModal);
     detailsInfoButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
-        openInfoModal(btn.dataset.infoTitle || "Coming soon", btn.dataset.infoMessage || "Details");
+        openInfoModal(
+          btn.dataset.infoTitle || "Coming soon",
+          btn.dataset.infoMessage || "Details",
+          btn.dataset.infoType || "text"
+        );
       });
     });
     closeInfoBtn.addEventListener("click", closeInfoModal);
