@@ -477,18 +477,46 @@
     }
     .map-label {
       font-family: 'Inter', sans-serif;
-      fill: #f8fafc;
-      font-size: 24px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      fill: #ffffff;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.015em;
+      paint-order: stroke;
+      stroke: rgba(4, 8, 18, 0.5);
+      stroke-width: 2px;
     }
     .map-label-sub {
       font-family: 'Inter', sans-serif;
-      fill: rgba(191, 219, 254, 0.95);
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
+      fill: #b8d7ff;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
       text-transform: uppercase;
+      paint-order: stroke;
+      stroke: rgba(4, 8, 18, 0.4);
+      stroke-width: 1.5px;
+    }
+    .map-chip {
+      fill: rgba(7, 12, 26, 0.94);
+      stroke: rgba(149, 181, 255, 0.62);
+      stroke-width: 2;
+    }
+    .map-chip.venue {
+      fill: rgba(8, 14, 34, 0.96);
+      stroke: rgba(165, 194, 255, 0.72);
+    }
+    @media (max-width: 768px) {
+      .map-label {
+        font-size: 30px;
+        stroke-width: 2.4px;
+      }
+      .map-label-sub {
+        font-size: 18px;
+        stroke-width: 1.8px;
+      }
+      .map-chip {
+        stroke-width: 2.4;
+      }
     }
     .map-note {
       margin-top: 0.55rem;
@@ -772,22 +800,22 @@
             <circle class="map-pin" cx="531" cy="238" r="35" fill="#3b82f6" filter="url(#pinGlow)"></circle>
             <circle class="map-pin" cx="531" cy="238" r="13" fill="#ffffff"></circle>
             <g transform="translate(586 196)">
-              <rect width="230" height="88" rx="14" fill="rgba(15,23,42,0.78)" stroke="rgba(255,255,255,0.2)"></rect>
+              <rect class="map-chip venue" width="230" height="88" rx="14"></rect>
               <text class="map-label" x="16" y="36">The Fountain</text>
               <text class="map-label-sub" x="16" y="62">Wedding Venue</text>
             </g>
             <g transform="translate(448 788)">
-              <rect width="244" height="88" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.2)"></rect>
+              <rect class="map-chip" width="244" height="88" rx="14"></rect>
               <text class="map-label" x="16" y="36">Main Gate</text>
               <text class="map-label-sub" x="16" y="62">North Terrace</text>
             </g>
             <g transform="translate(664 46)">
-              <rect width="206" height="76" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.2)"></rect>
+              <rect class="map-chip" width="206" height="76" rx="14"></rect>
               <text class="map-label" x="16" y="33">Friend's Gate</text>
               <text class="map-label-sub" x="16" y="58">Arrivals</text>
             </g>
             <g transform="translate(340 284)">
-              <rect width="194" height="76" rx="14" fill="rgba(15,23,42,0.72)" stroke="rgba(255,255,255,0.2)"></rect>
+              <rect class="map-chip" width="194" height="76" rx="14"></rect>
               <text class="map-label" x="16" y="33">Ginkgo Gate</text>
               <text class="map-label-sub" x="16" y="58">Arrivals</text>
             </g>
