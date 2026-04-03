@@ -575,6 +575,208 @@
       50% { transform: scale(1.11); opacity: 0.8; }
     }
 
+    /* Seating Button Pulse */
+    .seating-pulse {
+      position: relative;
+      border-color: rgba(96, 165, 250, 0.5);
+      background: rgba(96, 165, 250, 0.08);
+      animation: seatBtnGlow 2.8s ease-in-out infinite;
+    }
+    .seating-pulse::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(96, 165, 250, 0.4);
+      animation: seatRingPulse 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .seating-pulse:hover {
+      animation: none;
+      background: rgba(96, 165, 250, 0.16);
+      border-color: rgba(96, 165, 250, 0.7);
+    }
+    .seating-pulse:hover::after {
+      animation: none;
+      opacity: 0;
+    }
+    @keyframes seatBtnGlow {
+      0%, 100% { border-color: rgba(96, 165, 250, 0.3); background: rgba(96, 165, 250, 0.06); box-shadow: 0 0 0 rgba(96, 165, 250, 0); }
+      50% { border-color: rgba(96, 165, 250, 0.6); background: rgba(96, 165, 250, 0.12); box-shadow: 0 0 18px rgba(96, 165, 250, 0.15); }
+    }
+    @keyframes seatRingPulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.06); opacity: 0; }
+    }
+
+    /* Seating Plan */
+    .seating-plan {
+      display: none;
+      width: 100%;
+    }
+    .info-modal.seating-mode .seating-plan {
+      display: block;
+    }
+    .info-modal.seating-mode .info-copy {
+      display: none;
+    }
+    .info-modal.seating-mode .info-modal__panel {
+      width: min(420px, 94vw);
+      max-height: 92vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
+    }
+    .seating-header {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+    .seating-header .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .seating-header h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .seating-table-wrap {
+      position: relative;
+      display: flex;
+      gap: 0;
+      width: 100%;
+    }
+    .seating-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .seating-side.left {
+      align-items: flex-end;
+      padding-right: 0;
+    }
+    .seating-side.right {
+      align-items: flex-start;
+      padding-left: 0;
+    }
+    .seat {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .seat.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .seat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(96, 165, 250, 0.7);
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(96, 165, 250, 0.3);
+    }
+    .seat-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+    .seating-side.left .seat {
+      flex-direction: row-reverse;
+    }
+    .seating-side.left .seat-dot {
+      margin-left: 0;
+    }
+    .seating-table-center {
+      width: 48px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: stretch;
+    }
+    .seating-table-bar {
+      position: absolute;
+      top: 0.3rem;
+      bottom: 0.3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(96, 165, 250, 0.12) 0%, rgba(167, 139, 250, 0.12) 50%, rgba(52, 211, 153, 0.10) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .seating-table-bar::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 3px;
+      border-radius: 0 0 6px 6px;
+      background: rgba(96, 165, 250, 0.5);
+    }
+    .seating-table-bar::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 3px;
+      border-radius: 6px 6px 0 0;
+      background: rgba(52, 211, 153, 0.5);
+    }
+    .seating-couple-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(96, 165, 250, 0.12);
+      border: 1px solid rgba(96, 165, 250, 0.25);
+    }
+    .seating-couple-badge .seat-name {
+      color: #93c5fd;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+    .seating-couple-badge .seat-dot {
+      background: #93c5fd;
+      box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+    @media (max-width: 768px) {
+      .info-modal.seating-mode .info-modal__panel {
+        width: 96vw;
+        padding: 1rem;
+      }
+      .seat-name {
+        font-size: 0.78rem;
+      }
+      .seating-table-center {
+        width: 36px;
+      }
+      .seating-table-bar {
+        width: 22px;
+      }
+    }
+
     /* Dress Code */
     .dress-code-section {
       min-height: 80vh;
@@ -714,7 +916,7 @@
           <p class="label">02. Reception</p>
           <h2>Paper Tiger</h2>
           <p class="time">Dinner, drinks & celebrations<br>to follow the ceremony.</p>
-          <button type="button" class="details-btn" data-info-type="text" data-info-title="Seating Map" data-info-message="Paper Tiger seating map.">Seating Map</button>
+          <button type="button" class="details-btn seating-pulse" data-info-type="seating" data-info-title="Seating Plan" data-info-message="Paper Tiger seating arrangement.">Seating Plan</button>
         </div>
       </div>
     </section>
@@ -822,6 +1024,17 @@
           </g>
         </svg>
         <p class="info-copy map-note">Interactive routing and turn-by-turn details coming soon.</p>
+      </div>
+      <div class="seating-plan" id="seatingPlan">
+        <div class="seating-header">
+          <p class="label">Paper Tiger</p>
+          <h4>Seating Plan</h4>
+        </div>
+        <div class="seating-table-wrap">
+          <div class="seating-side left" id="seatingLeft"></div>
+          <div class="seating-table-center"><div class="seating-table-bar"></div></div>
+          <div class="seating-side right" id="seatingRight"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1279,7 +1492,43 @@
     const infoTitle = document.getElementById("infoTitle");
     const infoText = document.getElementById("infoText");
     const mapPreview = document.getElementById("mapPreview");
+    const seatingPlan = document.getElementById("seatingPlan");
+    const seatingLeft = document.getElementById("seatingLeft");
+    const seatingRight = document.getElementById("seatingRight");
     const detailsInfoButtons = document.querySelectorAll(".details-btn");
+
+    const seatingData = {
+      left:  ["Marco", "Vas", "Kat", "Issy", "Chiara", "Arthur", "Tim", "Josh", "Tom T", "Tom H", "Emma", "Bailey", "Bec", "Grandpa"],
+      right: ["Paolo", "Carla", "Christina", "Deana", "Kyle", "Zac", "Alex", "Loi", "Talia", "Betony", "Kathy", "Sally", "Nanny"]
+    };
+
+    function buildSeatingPlan() {
+      seatingLeft.innerHTML = "";
+      seatingRight.innerHTML = "";
+      const maxLen = Math.max(seatingData.left.length, seatingData.right.length);
+      for (let i = 0; i < maxLen; i++) {
+        // Left side
+        const lName = seatingData.left[i] || "";
+        const lSeat = document.createElement("div");
+        lSeat.className = "seat";
+        const isCouple = (lName === "Chiara" || lName === "Tim");
+        if (isCouple) {
+          lSeat.innerHTML = `<div class="seating-couple-badge"><span class="seat-name">${lName}</span><span class="seat-dot"></span></div>`;
+        } else if (lName) {
+          lSeat.innerHTML = `<span class="seat-name">${lName}</span><span class="seat-dot"></span>`;
+        }
+        seatingLeft.appendChild(lSeat);
+
+        // Right side
+        const rName = seatingData.right[i] || "";
+        const rSeat = document.createElement("div");
+        rSeat.className = "seat";
+        if (rName) {
+          rSeat.innerHTML = `<span class="seat-dot"></span><span class="seat-name">${rName}</span>`;
+        }
+        seatingRight.appendChild(rSeat);
+      }
+    }
 
     function syncBodyScrollLock() {
       const anyOpen = rsvpModal.classList.contains("open") || infoModal.classList.contains("open");
@@ -1301,16 +1550,27 @@
     function openInfoModal(title, message, type = "text") {
       infoTitle.textContent = title;
       infoText.textContent = `${message} Coming soon.`;
+      infoModal.classList.remove("map-mode", "seating-mode");
+      mapPreview.classList.remove("play");
+      mapPreview.hidden = true;
+
       if (type === "map") {
         infoModal.classList.add("map-mode");
         mapPreview.hidden = false;
         mapPreview.classList.remove("play");
         void mapPreview.offsetWidth;
         mapPreview.classList.add("play");
-      } else {
-        infoModal.classList.remove("map-mode");
-        mapPreview.classList.remove("play");
-        mapPreview.hidden = true;
+      } else if (type === "seating") {
+        infoModal.classList.add("seating-mode");
+        infoTitle.textContent = "";
+        buildSeatingPlan();
+        // Stagger-reveal seats after modal opens
+        requestAnimationFrame(() => {
+          const seats = seatingPlan.querySelectorAll(".seat");
+          seats.forEach((s, i) => {
+            setTimeout(() => s.classList.add("revealed"), 60 + i * 45);
+          });
+        });
       }
       infoModal.classList.add("open");
       infoModal.setAttribute("aria-hidden", "false");
@@ -1318,8 +1578,7 @@
     }
 
     function closeInfoModal() {
-      infoModal.classList.remove("open");
-      infoModal.classList.remove("map-mode");
+      infoModal.classList.remove("open", "map-mode", "seating-mode");
       infoModal.setAttribute("aria-hidden", "true");
       mapPreview.classList.remove("play");
       mapPreview.hidden = true;
