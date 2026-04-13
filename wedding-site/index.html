@@ -899,7 +899,6 @@
           <p>Adelaide Botanic Gardens</p>
           <p>4:30 PM (Arrive 4:15)</p>
         </div>
-        <button type="button" class="rsvp-btn nav-fade" id="openRsvpBtn">RSVP</button>
       </div>
     </section>
 
@@ -936,34 +935,6 @@
       <p class="countdown-minimal" id="countdownMinimal">Loading countdown...</p>
     </footer>
   </main>
-
-  <div class="rsvp-modal" id="rsvpModal" aria-hidden="true">
-    <div class="rsvp-modal__backdrop" id="rsvpBackdrop"></div>
-    <div class="rsvp-modal__panel glass-card" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
-      <div class="rsvp-modal__top">
-        <h3 id="rsvpTitle">RSVP</h3>
-        <button type="button" class="rsvp-close" id="closeRsvpBtn" aria-label="Close RSVP form">X</button>
-      </div>
-      <form class="rsvp-form" action="https://formsubmit.co/chiaramarinoo@gmail.com" method="POST">
-        <input type="hidden" name="_subject" value="Wedding RSVP - Chiara + Tim">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="hidden" name="_template" value="table">
-        <label>
-          Name
-          <input type="text" name="Name" required>
-        </label>
-        <label>
-          Guest(s) Name
-          <input type="text" name="Guests Name">
-        </label>
-        <label>
-          Dietary
-          <textarea name="Dietary"></textarea>
-        </label>
-        <button type="submit" class="rsvp-submit">Send RSVP</button>
-      </form>
-    </div>
-  </div>
 
   <div class="info-modal" id="infoModal" aria-hidden="true">
     <div class="info-modal__backdrop" id="infoBackdrop"></div>
@@ -1482,10 +1453,6 @@
     .to(bgUniforms.uSpeed, { value: 0.68, ease: "none" }, 0);
 
     // RSVP modal controls
-    const rsvpModal = document.getElementById("rsvpModal");
-    const openRsvpBtn = document.getElementById("openRsvpBtn");
-    const closeRsvpBtn = document.getElementById("closeRsvpBtn");
-    const rsvpBackdrop = document.getElementById("rsvpBackdrop");
     const infoModal = document.getElementById("infoModal");
     const infoBackdrop = document.getElementById("infoBackdrop");
     const closeInfoBtn = document.getElementById("closeInfoBtn");
@@ -1531,20 +1498,8 @@
     }
 
     function syncBodyScrollLock() {
-      const anyOpen = rsvpModal.classList.contains("open") || infoModal.classList.contains("open");
+      const anyOpen = infoModal.classList.contains("open");
       document.body.style.overflow = anyOpen ? "hidden" : "";
-    }
-
-    function openRsvpModal() {
-      rsvpModal.classList.add("open");
-      rsvpModal.setAttribute("aria-hidden", "false");
-      syncBodyScrollLock();
-    }
-
-    function closeRsvpModal() {
-      rsvpModal.classList.remove("open");
-      rsvpModal.setAttribute("aria-hidden", "true");
-      syncBodyScrollLock();
     }
 
     function openInfoModal(title, message, type = "text") {
@@ -1585,9 +1540,6 @@
       syncBodyScrollLock();
     }
 
-    openRsvpBtn.addEventListener("click", openRsvpModal);
-    closeRsvpBtn.addEventListener("click", closeRsvpModal);
-    rsvpBackdrop.addEventListener("click", closeRsvpModal);
     detailsInfoButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         openInfoModal(
@@ -1600,7 +1552,6 @@
     closeInfoBtn.addEventListener("click", closeInfoModal);
     infoBackdrop.addEventListener("click", closeInfoModal);
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && rsvpModal.classList.contains("open")) closeRsvpModal();
       if (e.key === "Escape" && infoModal.classList.contains("open")) closeInfoModal();
     });
 
